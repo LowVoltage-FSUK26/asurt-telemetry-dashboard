@@ -17,6 +17,7 @@ cmake_install.cmake
 build/
 build-*/
 .cmake/
+.cache/clangd/
 
 # Compiled Object files
 *.o
