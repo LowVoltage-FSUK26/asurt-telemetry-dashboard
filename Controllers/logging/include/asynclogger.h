@@ -10,8 +10,6 @@
 #include <QFile>
 #include <QTextStream>
 #include <QDateTime>
-#include <memory>
-
 // Forward declaration
 class LoggerWorker;
 
