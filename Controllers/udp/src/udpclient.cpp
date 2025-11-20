@@ -1,11 +1,16 @@
-
-#include "serialmanager.h"
-#include "serialreceiverworker.h"
-#include "serialparserworker.h"
+#include "../include/udpclient.h"
+#include "../include/udpreceiverworker.h"
+#include "../include/udpparserworker.h"
 #include <QDebug>
 #include <QThread>
 
-SerialManager::SerialManager(QObject *parent)
+/*UdpClient
+ * The central class managing the overall UDP client.
+ * It configures workers, maintains application-wide configuration (debug mode, thread count, performance counters, atomic property storage),
+ * and exposes a public API (start/stop, property signals) for external use or QML integration.
+ */
+
+UdpClient::UdpClient(QObject *parent)
     : QObject(parent),
     m_nextParserIndex(0),
     m_parserThreadCount(QThread::idealThreadCount()),
@@ -29,24 +34,24 @@ SerialManager::SerialManager(QObject *parent)
     m_longitudinalG(0.0)
 {
     // Create and configure the receiver worker
-    m_receiverWorker = new SerialReceiverWorker();
+    m_receiverWorker = new UdpReceiverWorker();
     m_receiverWorker->moveToThread(&m_receiverThread);
 
     // Connect signals and slots for receiver worker
-    connect(this, &SerialManager::startReceiving, m_receiverWorker, &SerialReceiverWorker::startReceiving, Qt::QueuedConnection);
-    connect(this, &SerialManager::stopReceiving, m_receiverWorker, &SerialReceiverWorker::stopReceiving, Qt::QueuedConnection);
-    connect(m_receiverWorker, &SerialReceiverWorker::serialDataReceived, this, &SerialManager::handleSerialDataReceived, Qt::QueuedConnection);
-    connect(m_receiverWorker, &SerialReceiverWorker::errorOccurred, this, &SerialManager::handleError, Qt::QueuedConnection);
+    connect(this, &UdpClient::startReceiving, m_receiverWorker, &UdpReceiverWorker::startReceiving, Qt::QueuedConnection);
+    connect(this, &UdpClient::stopReceiving, m_receiverWorker, &UdpReceiverWorker::stopReceiving, Qt::QueuedConnection);
+    connect(m_receiverWorker, &UdpReceiverWorker::datagramReceived, this, &UdpClient::handleDatagramReceived, Qt::QueuedConnection);
+    connect(m_receiverWorker, &UdpReceiverWorker::errorOccurred, this, &UdpClient::handleError, Qt::QueuedConnection);
 
     // Connect thread start/stop signals
-    connect(&m_receiverThread, &QThread::started, m_receiverWorker, &SerialReceiverWorker::initialize);
+    connect(&m_receiverThread, &QThread::started, m_receiverWorker, &UdpReceiverWorker::initialize);
     connect(&m_receiverThread, &QThread::finished, m_receiverWorker, &QObject::deleteLater);
 
     // Configure the parser thread pool
     m_parserPool.setMaxThreadCount(m_parserThreadCount);
 }
 
-SerialManager::~SerialManager()
+UdpClient::~UdpClient()
 {
     stop();
 
@@ -61,8 +66,9 @@ SerialManager::~SerialManager()
     cleanupParsers();
 }
 
-bool SerialManager::start(const QString &portName, qint32 baudRate)
+bool UdpClient::start(quint16 port)
 {
+
     QThread::currentThread()->setObjectName("Main Thread");
 
     // Stop if already running
@@ -75,21 +81,21 @@ bool SerialManager::start(const QString &portName, qint32 baudRate)
     m_receiverThread.start();
     m_receiverThread.setPriority(QThread::HighPriority);
 
-    // Start receiving serial data
-    emit startReceiving(portName, baudRate);
+    // Start receiving datagrams
+    emit startReceiving(port);
 
     if (m_debugMode)
     {
-        qDebug() << "Serial Manager started on port" << portName << "with baud rate" << baudRate << "running on the " << QThread::currentThread()
+        qDebug() << "UDP Client started on port" << port << "running on the " << QThread::currentThread()
         << "with" << m_parserThreadCount << "parser threads";
     }
 
     return true;
 }
 
-bool SerialManager::stop()
+bool UdpClient::stop()
 {
-    // Stop receiving serial data
+    // Stop receiving datagrams
     emit stopReceiving();
 
     // Clean up parser threads
@@ -97,13 +103,13 @@ bool SerialManager::stop()
 
     if (m_debugMode)
     {
-        qDebug() << "Serial Manager stopped";
+        qDebug() << "UDP Client stopped";
     }
 
     return true;
 }
 
-void SerialManager::setParserThreadCount(int count)
+void UdpClient::setParserThreadCount(int count)
 {
     if (count > 0 && count <= QThread::idealThreadCount() * 2)
     {
@@ -119,7 +125,7 @@ void SerialManager::setParserThreadCount(int count)
     }
 }
 
-void SerialManager::setDebugMode(bool enabled)
+void UdpClient::setDebugMode(bool enabled)
 {
     m_debugMode = enabled;
 
@@ -129,27 +135,27 @@ void SerialManager::setDebugMode(bool enabled)
     }
 }
 
-void SerialManager::handleSerialDataReceived(const QByteArray &data)
+void UdpClient::handleDatagramReceived(const QByteArray &data)
 {
-    // Distribute data among parsers in a round-robin fashion
+    // Distribute datagrams among parsers in a round-robin fashion
     if (!m_parsers.isEmpty())
     {
         // Get the next parser
-        SerialParserWorker *parser = m_parsers[m_nextParserIndex];
+        UdpParserWorker *parser = m_parsers[m_nextParserIndex];
 
-        // Queue the data for parsing
-        parser->queueData(data);
+        // Queue the datagram for parsing
+        parser->queueDatagram(data);
 
         // Update the next parser index
         m_nextParserIndex = (m_nextParserIndex + 1) % m_parsers.size();
     }
 }
 
-void SerialManager::handleParsedData(float speed, int rpm, int accPedal, int brakePedal,
-                                     double encoderAngle, float temperature, int batteryLevel,
-                                     double gpsLongitude, double gpsLatitude,
-                                     int speedFL, int speedFR, int speedBL, int speedBR,
-                                     double lateralG, double longitudinalG)
+void UdpClient::handleParsedData(float speed, int rpm, int accPedal, int brakePedal,
+                                 double encoderAngle, float temperature, int batteryLevel,
+                                 double gpsLongitude, double gpsLatitude,
+                                 int speedFL, int speedFR, int speedBL, int speedBR,
+                                 double lateralG, double longitudinalG)
 {
     // Increment processed count
     m_datagramsProcessed.fetch_add(1);
@@ -275,26 +281,26 @@ void SerialManager::handleParsedData(float speed, int rpm, int accPedal, int bra
     }
 }
 
-void SerialManager::handleError(const QString &error)
+void UdpClient::handleError(const QString &error)
 {
     if (m_debugMode)
     {
-        qDebug() << "Serial Manager error:" << error;
+        qDebug() << "UDP Client error:" << error;
     }
 
     emit errorOccurred(error);
 }
 
-void SerialManager::initializeParsers()
+void UdpClient::initializeParsers()
 {
     // Create parser instances
     for (int i = 0; i < m_parserThreadCount; ++i)
     {
-        SerialParserWorker *parser = new SerialParserWorker(m_debugMode);
+        UdpParserWorker *parser = new UdpParserWorker(m_debugMode);
 
         // Connect signals for results
-        connect(parser, &SerialParserWorker::dataParsed, this, &SerialManager::handleParsedData, Qt::QueuedConnection);
-        connect(parser, &SerialParserWorker::errorOccurred, this, &SerialManager::handleError, Qt::QueuedConnection);
+        connect(parser, &UdpParserWorker::datagramParsed, this, &UdpClient::handleParsedData, Qt::QueuedConnection);
+        connect(parser, &UdpParserWorker::errorOccurred, this, &UdpClient::handleError, Qt::QueuedConnection);
 
         // Add to list
         m_parsers.append(parser);
@@ -311,10 +317,10 @@ void SerialManager::initializeParsers()
     m_nextParserIndex = 0;
 }
 
-void SerialManager::cleanupParsers()
+void UdpClient::cleanupParsers()
 {
     // Stop all parsers
-    for (SerialParserWorker *parser : m_parsers)
+    for (UdpParserWorker *parser : m_parsers)
     {
         parser->stop();
     }
@@ -323,10 +329,10 @@ void SerialManager::cleanupParsers()
     m_parserPool.waitForDone();
 
     // Disconnect all signals
-    for (SerialParserWorker *parser : m_parsers)
+    for (UdpParserWorker *parser : m_parsers)
     {
-        disconnect(parser, &SerialParserWorker::dataParsed, this, &SerialManager::handleParsedData);
-        disconnect(parser, &SerialParserWorker::errorOccurred, this, &SerialManager::handleError);
+        disconnect(parser, &UdpParserWorker::datagramParsed, this, &UdpClient::handleParsedData);
+        disconnect(parser, &UdpParserWorker::errorOccurred, this, &UdpClient::handleError);
     }
 
     // Delete all parsers

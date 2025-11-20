@@ -1,5 +1,5 @@
 
-#include "serialparserworker.h"
+#include "../include/serialparserworker.h"
 #include <QDebug>
 #include <QDataStream>
 
@@ -123,6 +123,7 @@ void SerialParserWorker::parseData(const QByteArray &data)
                     gpsLongitude, gpsLatitude, speedFL, speedFR, speedBL, speedBR,
                     lateralG, longitudinalG);
 }
+
 
 
 

@@ -1,5 +1,5 @@
 
-#include "serialreceiverworker.h"
+#include "../include/serialreceiverworker.h"
 #include <QDebug>
 
 SerialReceiverWorker::SerialReceiverWorker(QObject *parent)

@@ -1,9 +1,9 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
-#include <Controllers/udpclient.h>
-#include <Controllers/serialmanager.h>
-#include <Controllers/communicationmanager.h>
-#include <Controllers/mqttclient.h>
+#include <Controllers/udp/include/udpclient.h>
+#include <Controllers/serial/include/serialmanager.h>
+#include <Controllers/communication_manager/include/communicationmanager.h>
+#include <Controllers/mqtt/include/mqttclient.h>
 #include <QQmlContext>
 #include <QThread>
 

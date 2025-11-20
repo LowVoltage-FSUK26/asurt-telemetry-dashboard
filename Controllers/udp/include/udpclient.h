@@ -1,24 +1,25 @@
-#ifndef MQTTCLIENT_H
-#define MQTTCLIENT_H
+#ifndef UDPCLIENT_H
+#define UDPCLIENT_H
 
 #include <QObject>
+#include <QUdpSocket>
 #include <QThread>
 #include <QThreadPool>
 #include <QAtomicInt>
+#include <QNetworkDatagram>
 #include <atomic>
-#include <QtMqtt/QMqttClient>
 
 // Forward declarations
-class MqttReceiverWorker;
-class MqttParserWorker;
+class UdpReceiverWorker;
+class UdpParserWorker;
 
 /**
- * @brief The MqttClient class provides a high-performance MQTT client for receiving and parsing messages
+ * @brief The UdpClient class provides a high-performance UDP client for receiving and parsing datagrams
  *
  * This class uses a simplified threading model with proper thread pool utilization for maximum performance.
  * It maintains the same public API as the original implementation while significantly reducing complexity.
  */
-class MqttClient : public QObject
+class UdpClient : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(float speed READ speed NOTIFY speedChanged)
@@ -38,24 +39,18 @@ class MqttClient : public QObject
     Q_PROPERTY(double longitudinalG READ longitudinalG NOTIFY longitudinalGChanged)
 
 public:
-    explicit MqttClient(QObject *parent = nullptr); // Initialize the Client , its threads and workers.
-    ~MqttClient();
+    explicit UdpClient(QObject *parent = nullptr); // Initialize the Client , its threads and workers.
+    ~UdpClient();
 
     /**
-     * @brief Start the MQTT client
-     * @param brokerAddress The MQTT broker address
-     * @param port The MQTT broker port
-     * @param useTls Whether to use TLS
-     * @param clientId The MQTT client ID
-     * @param username The MQTT username
-     * @param password The MQTT password
-     * @param topic The MQTT topic to subscribe to
+     * @brief Start the UDP client on the specified port
+     * @param port The UDP port to listen on
      * @return True if successful, false otherwise
      */
-    Q_INVOKABLE bool start(const QString &brokerAddress, quint16 port, bool useTls, const QString &clientId, const QString &username, const QString &password, const QString &topic);
+    Q_INVOKABLE bool start(quint16 port);
 
     /**
-     * @brief Stop the MQTT client
+     * @brief Stop the UDP client
      * @return True if successful, false otherwise
      */
     Q_INVOKABLE bool stop();
@@ -111,7 +106,7 @@ signals:
     void errorOccurred(const QString &error);
 
     // Internal signals for worker communication
-    void startReceiving(const QString &brokerAddress, quint16 port, bool useTls, const QString &clientId, const QString &username, const QString &password, const QString &topic);
+    void startReceiving(quint16 port);
     void stopReceiving();
 
 private slots:
@@ -123,24 +118,24 @@ private slots:
 
     void handleError(const QString &error); // Handles error messages from workers.
 
-    void handleMqttMessageReceived(const QByteArray &message); // Receives raw messages from the receiver worker and dispatches them to parser workers.
+    void handleDatagramReceived(const QByteArray &data); // Receives raw datagrams from the receiver worker and dispatches them to parser workers.
 
 private:
     // Worker threads
-    QThread m_receiverThread;             // Dedicated thread for the receiver worker
-    MqttReceiverWorker *m_receiverWorker; // The worker that listens to the MQTT messages
+    QThread m_receiverThread;            // Dedicated thread for the receiver worker
+    UdpReceiverWorker *m_receiverWorker; // The worker that listens to the UDP datagrams
 
-    QThreadPool m_parserPool;            // A thread pool to run multiple parsers workers concurrently
-    QList<MqttParserWorker *> m_parsers; // list of  parser worker objects
-    int m_nextParserIndex;               // Used to cycle through parser workers in a round-robin fashion, distributing incoming messages among multiple parsers.
+    QThreadPool m_parserPool;           // A thread pool to run multiple parsers workers concurrently
+    QList<UdpParserWorker *> m_parsers; // list of  parser worker objects
+    int m_nextParserIndex;              // Used to cycle through parser workers in a round-robin fashion, distributing incoming datagrams among multiple parsers.
 
     // Configuration
     int m_parserThreadCount;
     bool m_debugMode;
 
     // Performance tracking
-    std::atomic<qint64> m_messagesProcessed;
-    std::atomic<qint64> m_messagesDropped;
+    std::atomic<qint64> m_datagramsProcessed;
+    std::atomic<qint64> m_datagramsDropped;
 
     // Data storage with atomic access
     std::atomic<float> m_speed;
@@ -164,4 +159,5 @@ private:
     void cleanupParsers();
 };
 
-#endif // MQTTCLIENT_H
+#endif // UDPCLIENT_H
+
