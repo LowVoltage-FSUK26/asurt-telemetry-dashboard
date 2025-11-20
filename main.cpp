@@ -4,12 +4,18 @@
 #include <Controllers/serial/include/serialmanager.h>
 #include <Controllers/communication_manager/include/communicationmanager.h>
 #include <Controllers/mqtt/include/mqttclient.h>
+#include <Controllers/logging/include/asynclogger.h>
 #include <QQmlContext>
 #include <QThread>
 
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
+    
+    // Set application information for QSettings
+    QCoreApplication::setOrganizationName("ASURT");
+    QCoreApplication::setOrganizationDomain("asurt.eu");
+    QCoreApplication::setApplicationName("Car_Dashboard");
 
     QQmlApplicationEngine engine;
     UdpClient udpClient;
@@ -31,7 +37,12 @@ int main(int argc, char *argv[])
         Qt::QueuedConnection);
     engine.loadFromModule("GUI", "Main");
 
-    return app.exec();
+    int result = app.exec();
+    
+    // Ensure proper cleanup before exit
+    AsyncLogger::instance().shutdown();
+    
+    return result;
 }
 
 

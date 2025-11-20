@@ -58,7 +58,11 @@ SerialManager::~SerialManager()
     if (m_receiverThread.isRunning())
     {
         m_receiverThread.quit();
-        m_receiverThread.wait();
+        if (!m_receiverThread.wait(3000)) {
+            qWarning() << "Serial receiver thread did not terminate gracefully";
+            m_receiverThread.terminate();
+            m_receiverThread.wait(1000);
+        }
     }
 
     // Clean up parsers
@@ -323,18 +327,19 @@ void SerialManager::cleanupParsers()
         parser->stop();
     }
 
-    // Wait for all tasks to complete
-    m_parserPool.waitForDone();
+    // Wait for all tasks to complete with timeout
+    if (!m_parserPool.waitForDone(3000)) {
+        qWarning() << "Serial parser pool did not finish in time";
+    }
 
-    // Disconnect all signals
+    // Disconnect all parsers
     for (SerialParserWorker *parser : m_parsers)
     {
         disconnect(parser, &SerialParserWorker::dataParsed, this, &SerialManager::handleParsedData);
         disconnect(parser, &SerialParserWorker::errorOccurred, this, &SerialManager::handleError);
     }
 
-    // Delete all parsers
-    qDeleteAll(m_parsers);
+    // Clear the list (autoDelete will handle deletion)
     m_parsers.clear();
 }
 

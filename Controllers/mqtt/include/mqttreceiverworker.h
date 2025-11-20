@@ -93,6 +93,7 @@ private:
     QMqttSubscription *m_subscription;
     QString m_topic;
     bool m_useTls;
+    bool m_isShuttingDown;
 
     void setupMqttClient(const QString &brokerAddress, quint16 port, const QString &clientId, const QString &username, const QString &password);
 };

@@ -53,7 +53,11 @@ MqttClient::~MqttClient()
     if (m_receiverThread.isRunning())
     {
         m_receiverThread.quit();
-        m_receiverThread.wait();
+        if (!m_receiverThread.wait(3000)) {
+            qWarning() << "MQTT receiver thread did not terminate gracefully";
+            m_receiverThread.terminate();
+            m_receiverThread.wait(1000);
+        }
     }
 
     cleanupParsers();
@@ -269,20 +273,25 @@ void MqttClient::initializeParsers()
 
 void MqttClient::cleanupParsers()
 {
+    // Stop all parsers
     for (MqttParserWorker *parser : m_parsers)
     {
         parser->stop();
     }
 
-    m_parserPool.waitForDone();
+    // Wait for all tasks to complete with timeout
+    if (!m_parserPool.waitForDone(3000)) {
+        qWarning() << "MQTT parser pool did not finish in time";
+    }
 
+    // Disconnect all parsers
     for (MqttParserWorker *parser : m_parsers)
     {
         disconnect(parser, &MqttParserWorker::messageParsed, this, &MqttClient::handleParsedData);
         disconnect(parser, &MqttParserWorker::errorOccurred, this, &MqttClient::handleError);
     }
 
-    qDeleteAll(m_parsers);
+    // Clear the list (autoDelete will handle deletion)
     m_parsers.clear();
 }
 

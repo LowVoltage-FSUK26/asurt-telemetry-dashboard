@@ -8,15 +8,21 @@ MqttReceiverWorker::MqttReceiverWorker(QObject *parent)
     : QObject(parent),
     m_client(nullptr),
     m_subscription(nullptr),
-    m_useTls(false)
+    m_useTls(false),
+    m_isShuttingDown(false)
 {
 }
 
 MqttReceiverWorker::~MqttReceiverWorker()
 {
-    stopReceiving();
+    // stopReceiving already sets m_isShuttingDown and disconnects
+    if (m_client && m_client->state() == QMqttClient::Connected) {
+        stopReceiving();
+    }
+    
     if (m_client) {
-        m_client->deleteLater();
+        delete m_client; // Direct delete since we're in the same thread
+        m_client = nullptr;
     }
 }
 
@@ -66,6 +72,12 @@ void MqttReceiverWorker::stopReceiving()
 {
     if (m_client) {
         if (m_client->state() == QMqttClient::Connected) {
+            // Set shutdown flag to prevent onDisconnected from emitting errors
+            m_isShuttingDown = true;
+            
+            // Disconnect the onDisconnected slot to avoid duplicate messages
+            disconnect(m_client, &QMqttClient::disconnected, this, &MqttReceiverWorker::onDisconnected);
+            
             m_client->disconnectFromHost();
             qDebug() << "Disconnected from MQTT broker.";
         }
@@ -87,8 +99,10 @@ void MqttReceiverWorker::onConnected()
 
 void MqttReceiverWorker::onDisconnected()
 {
-    qDebug() << "Disconnected from MQTT broker.";
-    emit errorOccurred("Disconnected from MQTT broker.");
+    if (!m_isShuttingDown) {
+        qDebug() << "Disconnected from MQTT broker.";
+        emit errorOccurred("Disconnected from MQTT broker.");
+    }
 }
 
 void MqttReceiverWorker::onMessageReceived(const QByteArray &message, const QMqttTopicName &topic)
@@ -147,7 +161,6 @@ void MqttReceiverWorker::setupMqttClient(const QString &brokerAddress, quint16 p
     m_client->setClientId(clientId);
     m_client->setUsername(username);
     m_client->setPassword(password);
-
 }
 
 

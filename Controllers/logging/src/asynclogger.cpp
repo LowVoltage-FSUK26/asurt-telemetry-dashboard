@@ -60,15 +60,24 @@ void AsyncLogger::shutdown()
         return;
     }
     
+    // Signal worker to close files
     emit shutdownWorker();
     
+    // Give worker time to process signal
+    QThread::msleep(50);
+    
+    // Stop the thread
     if (m_workerThread.isRunning()) {
         m_workerThread.quit();
-        m_workerThread.wait(2000); // Wait up to 2 seconds
+        if (!m_workerThread.wait(3000)) { // Wait up to 3 seconds
+            qWarning() << "AsyncLogger worker thread did not terminate gracefully, forcing termination";
+            m_workerThread.terminate();
+            m_workerThread.wait(1000);
+        }
     }
     
     m_initialized = false;
-    qDebug() << "AsyncLogger shutdown";
+    qDebug() << "AsyncLogger shutdown complete";
 }
 
 void AsyncLogger::logIMU(int16_t ang_x, int16_t ang_y, int16_t ang_z)

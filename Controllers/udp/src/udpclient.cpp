@@ -63,7 +63,11 @@ UdpClient::~UdpClient()
     if (m_receiverThread.isRunning())
     {
         m_receiverThread.quit();
-        m_receiverThread.wait();
+        if (!m_receiverThread.wait(3000)) {
+            qWarning() << "UDP receiver thread did not terminate gracefully";
+            m_receiverThread.terminate();
+            m_receiverThread.wait(1000);
+        }
     }
 
     // Clean up parsers
@@ -329,18 +333,19 @@ void UdpClient::cleanupParsers()
         parser->stop();
     }
 
-    // Wait for all tasks to complete
-    m_parserPool.waitForDone();
+    // Wait for all tasks to complete with timeout
+    if (!m_parserPool.waitForDone(3000)) {
+        qWarning() << "UDP parser pool did not finish in time";
+    }
 
-    // Disconnect all signals
+    // Disconnect all parsers
     for (UdpParserWorker *parser : m_parsers)
     {
         disconnect(parser, &UdpParserWorker::datagramParsed, this, &UdpClient::handleParsedData);
         disconnect(parser, &UdpParserWorker::errorOccurred, this, &UdpClient::handleError);
     }
 
-    // Delete all parsers
-    qDeleteAll(m_parsers);
+    // Clear the list (autoDelete will handle deletion)
     m_parsers.clear();
 }
 
