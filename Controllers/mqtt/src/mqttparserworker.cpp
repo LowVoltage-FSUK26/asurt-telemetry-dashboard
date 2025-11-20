@@ -1,4 +1,6 @@
 #include "../include/mqttparserworker.h"
+#include "../../can/include/candecoder.h"
+#include "../../logging/include/asynclogger.h"
 #include <QDebug>
 #include <QThread>
 #include <QJsonDocument>
@@ -95,73 +97,126 @@ void MqttParserWorker::parseMessage(const QByteArray &message)
 {
     try
     {
-        // Convert message data to string and split by comma
-        QString dataStr = QString::fromUtf8(message).trimmed();
-        QStringList parts = dataStr.split(',');
-
-        // Check if we have enough parts (now 15 parts with lateral and longitudinal G)
-        if (parts.size() >= 15)
+        // Validate CAN packet size (20 bytes)
+        if (message.size() != CANDecoder::PACKET_SIZE)
         {
-            bool okSpeed = false, okRpm = false, okAcc = false, okBrake = false;
-            bool okAngle = false, okTemp = false, okBattery = false;
-            bool okGpsLon = false, okGpsLat = false;
-            bool okWSFL = false, okWSFR = false, okWSBL = false, okWSBR = false;
-            bool okLateralG = false, okLongitudinalG = false;
-
-            // Parse values
-            float speed = parts[0].toFloat(&okSpeed);
-            int rpm = parts[1].toInt(&okRpm);
-            int accPedal = parts[2].toInt(&okAcc);
-            int brakePedal = parts[3].toInt(&okBrake);
-            double encoderAngle = parts[4].toDouble(&okAngle);
-            float temperature = parts[5].toFloat(&okTemp);
-            int batteryLevel = parts[6].toInt(&okBattery);
-            double gpsLongitude = parts[7].toDouble(&okGpsLon);
-            double gpsLatitude = parts[8].toDouble(&okGpsLat);
-            int speedFL = parts[9].toInt(&okWSFL);
-            int speedFR = parts[10].toInt(&okWSFR);
-            int speedBL = parts[11].toInt(&okWSBL);
-            int speedBR = parts[12].toInt(&okWSBR);
-            double lateralG = parts[13].toDouble(&okLateralG);
-            double longitudinalG = parts[14].toDouble(&okLongitudinalG);
-
-            // Check if all values were parsed successfully
-            if (okSpeed && okRpm && okAcc && okBrake && okAngle && okTemp &&
-                okBattery && okGpsLon && okGpsLat &&
-                okWSFL && okWSFR && okWSBL && okWSBR &&
-                okLateralG && okLongitudinalG)
-            {
-                // Emit signal with parsed data
-                emit messageParsed(
-                    speed, rpm, accPedal, brakePedal,
-                    encoderAngle, temperature, batteryLevel,
-                    gpsLongitude, gpsLatitude,
-                    speedFL, speedFR, speedBL, speedBR,
-                    lateralG, longitudinalG);
-
-                // Log debug info
-                if (m_debugMode)
-                {
-                    qDebug() << "MqttParserWorker: Parsed message - Speed:" << speed << "RPM:" << rpm;
-                }
-            }
-            else
-            {
-                emit errorOccurred("MQTT: Failed to parse some values in message");
-            }
+            emit errorOccurred(QString("MQTT: Invalid CAN packet size (expected %1 bytes, got %2)")
+                .arg(CANDecoder::PACKET_SIZE).arg(message.size()));
+            return;
         }
-        else
+
+        // Extract CAN ID
+        uint32_t canId = CANDecoder::extractCANId(message);
+        QByteArray payload = CANDecoder::extractPayload(message);
+        
+        // Initialize default values
+        float speed = 0.0f;
+        int rpm = 0;
+        int accPedal = 0;
+        int brakePedal = 0;
+        double encoderAngle = 0.0;
+        float temperature = 0.0f;
+        int batteryLevel = 0;
+        double gpsLongitude = 0.0;
+        double gpsLatitude = 0.0;
+        int speedFL = 0;
+        int speedFR = 0;
+        int speedBL = 0;
+        int speedBR = 0;
+        double lateralG = 0.0;
+        double longitudinalG = 0.0;
+        
+        bool shouldEmit = false;
+        
+        // Decode based on CAN ID
+        switch (canId)
         {
-            emit errorOccurred(QString("MQTT message has incorrect format (expected 15+ parts, got %1)").arg(parts.size()));
+        case CANDecoder::CAN_ID_IMU_ANGLE: // 0x071
+        {
+            auto imuAngle = CANDecoder::decodeIMUAngle(payload);
+            AsyncLogger::instance().logIMU(imuAngle.ang_x, imuAngle.ang_y, imuAngle.ang_z);
+            // Log only, no GUI update
+            break;
+        }
+        
+        case CANDecoder::CAN_ID_IMU_ACCEL: // 0x072
+        {
+            auto imuAccel = CANDecoder::decodeIMUAccel(payload);
+            lateralG = imuAccel.lateral_g;
+            longitudinalG = imuAccel.longitudinal_g;
+            shouldEmit = true;
+            break;
+        }
+        
+        case CANDecoder::CAN_ID_ADC: // 0x073
+        {
+            auto adc = CANDecoder::decodeADC(payload);
+            accPedal = adc.acc_pedal;
+            brakePedal = adc.brake_pedal;
+            AsyncLogger::instance().logSuspension(adc.sus_1, adc.sus_2, adc.sus_3, adc.sus_4);
+            shouldEmit = true;
+            break;
+        }
+        
+        case CANDecoder::CAN_ID_PROXIMITY_ENCODER: // 0x074
+        {
+            auto prox = CANDecoder::decodeProximityAndEncoder(payload);
+            speed = prox.speed_kmh;
+            speedFL = static_cast<int>(prox.speed_fl);
+            speedFR = static_cast<int>(prox.speed_fr);
+            speedBL = static_cast<int>(prox.speed_bl);
+            speedBR = static_cast<int>(prox.speed_br);
+            encoderAngle = prox.encoder_angle;
+            shouldEmit = true;
+            break;
+        }
+        
+        case CANDecoder::CAN_ID_GPS: // 0x075
+        {
+            auto gps = CANDecoder::decodeGPS(payload);
+            gpsLongitude = gps.longitude;
+            gpsLatitude = gps.latitude;
+            shouldEmit = true;
+            break;
+        }
+        
+        case CANDecoder::CAN_ID_TEMPERATURES: // 0x076
+        {
+            auto temps = CANDecoder::decodeTemperatures(payload);
+            AsyncLogger::instance().logTemperature(temps.temp_fl, temps.temp_fr, temps.temp_rl, temps.temp_rr);
+            // Log only, no GUI update
+            break;
+        }
+        
+        default:
+            emit errorOccurred(QString("MQTT: Unknown CAN ID: 0x%1").arg(canId, 0, 16));
+            return;
+        }
+        
+        // Emit parsed data if needed
+        if (shouldEmit)
+        {
+            emit messageParsed(
+                speed, rpm, accPedal, brakePedal,
+                encoderAngle, temperature, batteryLevel,
+                gpsLongitude, gpsLatitude,
+                speedFL, speedFR, speedBL, speedBR,
+                lateralG, longitudinalG);
+            
+            if (m_debugMode)
+            {
+                qDebug() << "MqttParserWorker: Decoded CAN ID 0x" << QString::number(canId, 16)
+                         << "- Speed:" << speed << "LatG:" << lateralG;
+            }
         }
     }
     catch (const std::exception &e)
     {
-        emit errorOccurred(QString("MQTT: Exception during parsing: %1").arg(e.what()));
+        emit errorOccurred(QString("MQTT: Exception during CAN decoding: %1").arg(e.what()));
     }
     catch (...)
     {
-        emit errorOccurred("MQTT: Unknown exception during parsing");
+        emit errorOccurred("MQTT: Unknown exception during CAN decoding");
     }
 }
 

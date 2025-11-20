@@ -1,6 +1,7 @@
 #include "../include/udpclient.h"
 #include "../include/udpreceiverworker.h"
 #include "../include/udpparserworker.h"
+#include "../../logging/include/asynclogger.h"
 #include <QDebug>
 #include <QThread>
 
@@ -33,6 +34,9 @@ UdpClient::UdpClient(QObject *parent)
     m_lateralG(0.0),
     m_longitudinalG(0.0)
 {
+    // Initialize async logger
+    AsyncLogger::instance().initialize("./logs");
+    
     // Create and configure the receiver worker
     m_receiverWorker = new UdpReceiverWorker();
     m_receiverWorker->moveToThread(&m_receiverThread);

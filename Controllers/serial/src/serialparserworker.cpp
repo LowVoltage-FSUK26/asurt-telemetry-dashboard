@@ -1,5 +1,7 @@
 
 #include "../include/serialparserworker.h"
+#include "../../can/include/candecoder.h"
+#include "../../logging/include/asynclogger.h"
 #include <QDebug>
 #include <QDataStream>
 
@@ -65,63 +67,128 @@ void SerialParserWorker::run()
 
 void SerialParserWorker::parseData(const QByteArray &data)
 {
-    QString dataString = QString::fromUtf8(data).trimmed();
-    QStringList fields = dataString.split(",");
-
-    // Expected number of fields based on the MCU format
-    const int expectedFields = 15;
-
-    if (fields.size() != expectedFields)
+    try
     {
-        if (m_debugMode)
+        // Validate CAN packet size (20 bytes)
+        if (data.size() != CANDecoder::PACKET_SIZE)
         {
-            qDebug() << "SerialParserWorker: Received incomplete or malformed data. Expected" << expectedFields << "fields, got" << fields.size() << ":" << dataString;
+            if (m_debugMode)
+            {
+                qDebug() << "SerialParserWorker: Invalid CAN packet size (expected" 
+                         << CANDecoder::PACKET_SIZE << "bytes, got" << data.size() << ")";
+            }
+            emit errorOccurred("Serial: Invalid CAN packet size");
+            return;
         }
-        emit errorOccurred("Incomplete or malformed serial data received.");
-        return;
+
+        // Extract CAN ID
+        uint32_t canId = CANDecoder::extractCANId(data);
+        QByteArray payload = CANDecoder::extractPayload(data);
+        
+        // Initialize default values
+        float speed = 0.0f;
+        int rpm = 0;
+        int accPedal = 0;
+        int brakePedal = 0;
+        double encoderAngle = 0.0;
+        float temperature = 0.0f;
+        int batteryLevel = 0;
+        double gpsLongitude = 0.0;
+        double gpsLatitude = 0.0;
+        int speedFL = 0;
+        int speedFR = 0;
+        int speedBL = 0;
+        int speedBR = 0;
+        double lateralG = 0.0;
+        double longitudinalG = 0.0;
+        
+        bool shouldEmit = false;
+        
+        // Decode based on CAN ID
+        switch (canId)
+        {
+        case CANDecoder::CAN_ID_IMU_ANGLE: // 0x071
+        {
+            auto imuAngle = CANDecoder::decodeIMUAngle(payload);
+            AsyncLogger::instance().logIMU(imuAngle.ang_x, imuAngle.ang_y, imuAngle.ang_z);
+            // Log only, no GUI update
+            break;
+        }
+        
+        case CANDecoder::CAN_ID_IMU_ACCEL: // 0x072
+        {
+            auto imuAccel = CANDecoder::decodeIMUAccel(payload);
+            lateralG = imuAccel.lateral_g;
+            longitudinalG = imuAccel.longitudinal_g;
+            shouldEmit = true;
+            break;
+        }
+        
+        case CANDecoder::CAN_ID_ADC: // 0x073
+        {
+            auto adc = CANDecoder::decodeADC(payload);
+            accPedal = adc.acc_pedal;
+            brakePedal = adc.brake_pedal;
+            AsyncLogger::instance().logSuspension(adc.sus_1, adc.sus_2, adc.sus_3, adc.sus_4);
+            shouldEmit = true;
+            break;
+        }
+        
+        case CANDecoder::CAN_ID_PROXIMITY_ENCODER: // 0x074
+        {
+            auto prox = CANDecoder::decodeProximityAndEncoder(payload);
+            speed = prox.speed_kmh;
+            speedFL = static_cast<int>(prox.speed_fl);
+            speedFR = static_cast<int>(prox.speed_fr);
+            speedBL = static_cast<int>(prox.speed_bl);
+            speedBR = static_cast<int>(prox.speed_br);
+            encoderAngle = prox.encoder_angle;
+            shouldEmit = true;
+            break;
+        }
+        
+        case CANDecoder::CAN_ID_GPS: // 0x075
+        {
+            auto gps = CANDecoder::decodeGPS(payload);
+            gpsLongitude = gps.longitude;
+            gpsLatitude = gps.latitude;
+            shouldEmit = true;
+            break;
+        }
+        
+        case CANDecoder::CAN_ID_TEMPERATURES: // 0x076
+        {
+            auto temps = CANDecoder::decodeTemperatures(payload);
+            AsyncLogger::instance().logTemperature(temps.temp_fl, temps.temp_fr, temps.temp_rl, temps.temp_rr);
+            // Log only, no GUI update
+            break;
+        }
+        
+        default:
+            if (m_debugMode)
+            {
+                qDebug() << "SerialParserWorker: Unknown CAN ID: 0x" << QString::number(canId, 16);
+            }
+            emit errorOccurred(QString("Serial: Unknown CAN ID: 0x%1").arg(canId, 0, 16));
+            return;
+        }
+        
+        // Emit parsed data if needed
+        if (shouldEmit)
+        {
+            emit dataParsed(speed, rpm, accPedal, brakePedal, encoderAngle, temperature, batteryLevel,
+                            gpsLongitude, gpsLatitude, speedFL, speedFR, speedBL, speedBR,
+                            lateralG, longitudinalG);
+        }
     }
-
-    // Parse data based on the MCU format:
-    // speed, rpm, accPedal, brakePedal, encoderAngle,
-    // temperature, batteryLevel, gpsLongitude, gpsLatitude,
-    // frWheelSpeed, flWheelSpeed, brWheelSpeed, blWheelSpeed,
-    // lateralG, longitudinalG
-
-    bool ok;
-    float speed = fields.at(0).toFloat(&ok);
-    if (!ok) { if (m_debugMode) qDebug() << "Failed to parse speed"; return; }
-    int rpm = fields.at(1).toInt(&ok);
-    if (!ok) { if (m_debugMode) qDebug() << "Failed to parse rpm"; return; }
-    int accPedal = fields.at(2).toInt(&ok);
-    if (!ok) { if (m_debugMode) qDebug() << "Failed to parse accPedal"; return; }
-    int brakePedal = fields.at(3).toInt(&ok);
-    if (!ok) { if (m_debugMode) qDebug() << "Failed to parse brakePedal"; return; }
-    double encoderAngle = fields.at(4).toDouble(&ok);
-    if (!ok) { if (m_debugMode) qDebug() << "Failed to parse encoderAngle"; return; }
-    float temperature = fields.at(5).toFloat(&ok);
-    if (!ok) { if (m_debugMode) qDebug() << "Failed to parse temperature"; return; }
-    int batteryLevel = fields.at(6).toInt(&ok);
-    if (!ok) { if (m_debugMode) qDebug() << "Failed to parse batteryLevel"; return; }
-    double gpsLongitude = fields.at(7).toDouble(&ok);
-    if (!ok) { if (m_debugMode) qDebug() << "Failed to parse gpsLongitude"; return; }
-    double gpsLatitude = fields.at(8).toDouble(&ok);
-    if (!ok) { if (m_debugMode) qDebug() << "Failed to parse gpsLatitude"; return; }
-    int speedFR = fields.at(9).toInt(&ok); // frWheelSpeed
-    if (!ok) { if (m_debugMode) qDebug() << "Failed to parse speedFR"; return; }
-    int speedFL = fields.at(10).toInt(&ok); // flWheelSpeed
-    if (!ok) { if (m_debugMode) qDebug() << "Failed to parse speedFL"; return; }
-    int speedBR = fields.at(11).toInt(&ok); // brWheelSpeed
-    if (!ok) { if (m_debugMode) qDebug() << "Failed to parse speedBR"; return; }
-    int speedBL = fields.at(12).toInt(&ok); // blWheelSpeed
-    if (!ok) { if (m_debugMode) qDebug() << "Failed to parse speedBL"; return; }
-    double lateralG = fields.at(13).toDouble(&ok);
-    if (!ok) { if (m_debugMode) qDebug() << "Failed to parse lateralG"; return; }
-    double longitudinalG = fields.at(14).toDouble(&ok);
-    if (!ok) { if (m_debugMode) qDebug() << "Failed to parse longitudinalG"; return; }
-
-    emit dataParsed(speed, rpm, accPedal, brakePedal, encoderAngle, temperature, batteryLevel,
-                    gpsLongitude, gpsLatitude, speedFL, speedFR, speedBL, speedBR,
-                    lateralG, longitudinalG);
+    catch (const std::exception &e)
+    {
+        emit errorOccurred(QString("Serial: Exception during CAN decoding: %1").arg(e.what()));
+    }
+    catch (...)
+    {
+        emit errorOccurred("Serial: Unknown exception during CAN decoding");
+    }
 }
 
 

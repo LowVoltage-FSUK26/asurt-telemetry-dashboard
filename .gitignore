@@ -93,6 +93,10 @@ qmldir
 # QML Language Server
 .qmlls.ini
 
+# CAN Data Logs
+logs/
+*.csv
+
 # Qt Meta Object Compiler
 *.moc
 

@@ -2,6 +2,7 @@
 #include "../include/mqttclient.h"
 #include "../include/mqttreceiverworker.h"
 #include "../include/mqttparserworker.h"
+#include "../../logging/include/asynclogger.h"
 #include <QDebug>
 #include <QThread>
 
@@ -28,6 +29,9 @@ MqttClient::MqttClient(QObject *parent)
     m_lateralG(0.0),
     m_longitudinalG(0.0)
 {
+    // Initialize async logger
+    AsyncLogger::instance().initialize("./logs");
+    
     m_receiverWorker = new MqttReceiverWorker();
     m_receiverWorker->moveToThread(&m_receiverThread);
 

@@ -2,6 +2,7 @@
 #include "../include/serialmanager.h"
 #include "../include/serialreceiverworker.h"
 #include "../include/serialparserworker.h"
+#include "../../logging/include/asynclogger.h"
 #include <QDebug>
 #include <QThread>
 
@@ -28,6 +29,9 @@ SerialManager::SerialManager(QObject *parent)
     m_lateralG(0.0),
     m_longitudinalG(0.0)
 {
+    // Initialize async logger
+    AsyncLogger::instance().initialize("./logs");
+    
     // Create and configure the receiver worker
     m_receiverWorker = new SerialReceiverWorker();
     m_receiverWorker->moveToThread(&m_receiverThread);
