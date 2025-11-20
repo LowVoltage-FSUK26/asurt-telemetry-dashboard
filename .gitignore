@@ -90,6 +90,9 @@ qmldir
 # QML Module Cache
 .qmlcache/
 
+# QML Language Server
+.qmlls.ini
+
 # Qt Meta Object Compiler
 *.moc
 
