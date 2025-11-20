@@ -1,5 +1,6 @@
 import QtQuick 2.15
 import QtQuick.Controls
+import Qt.labs.settings 1.0
 import "../.."
 
 Rectangle {
@@ -11,6 +12,28 @@ Rectangle {
     radius: 40
     border.color: "#A6F1E0"
     border.width: 5
+
+    // Settings component for persistent storage
+    Settings {
+        id: appSettings
+        category: "WelcomePageInputs"
+        
+        // TextField values
+        property alias sessionName: sessionNameField.text
+        property alias mqttBrokerAddress: mqttbrokerAddressField.text
+        property alias serverClientPort: serverClientPortField.text
+        property alias mqttClientId: mqttClientIdField.text
+        property alias mqttUsername: mqttUsernameField.text
+        property alias mqttPassword: mqttPasswordField.text
+        property alias mqttTopic: mqttTopicField.text
+        property alias driverName: driverNameField.text
+        property alias sessionGoals: goalsField.text
+        
+        // ComboBox selections (storing currentIndex)
+        property alias mqttProtocolIndex: mqttProtocolField.currentIndex
+        property alias serialPortIndex: serialPortField.currentIndex
+        property alias serialBaudRateIndex: serialBaudRate.currentIndex
+    }
 
     /**** Layout for the Two Rectangles ***/
 
