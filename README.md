@@ -1,4 +1,5 @@
 # ASURT Telemetry Dashboard
+
 <div align="center">
 
 **A real-time vehicle telemetry monitoring system for Formula Student racing**
