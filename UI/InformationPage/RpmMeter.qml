@@ -4,8 +4,17 @@ import QtQuick.Controls
 
 Item {
     id: rpmMeter
-    width: 360
-    height: 360
+    
+    // Scale factor for responsive sizing
+    property real scaleFactor: 1.0
+    
+    // Design-time dimensions
+    readonly property real designWidth: 360
+    readonly property real designHeight: 360
+    
+    // Scaled dimensions
+    width: designWidth * scaleFactor
+    height: designHeight * scaleFactor
 
     property int rpm: 0
 
@@ -17,6 +26,11 @@ Item {
     }
 
     onRpmChanged: {
+        gaugeCanvas.requestPaint()
+        needleCanvas.requestPaint()
+    }
+    
+    onScaleFactorChanged: {
         gaugeCanvas.requestPaint()
         needleCanvas.requestPaint()
     }
@@ -37,12 +51,12 @@ Item {
 
     Column {
         anchors.centerIn: parent
-        spacing: 8     // Reduced from 18 to bring everything closer together
+        spacing: 8 * scaleFactor
 
         Item {
             id: gaugeItem
-            width: 270
-            height: 250  // Reduced height to bring text closer to gauge
+            width: 270 * scaleFactor
+            height: 250 * scaleFactor
 
             Canvas {
                 id: gaugeCanvas
@@ -52,7 +66,7 @@ Item {
                     var ctx = getContext("2d");
                     var centerX = width / 2;
                     var centerY = height / 2;
-                    var radius = 108;
+                    var radius = 108 * rpmMeter.scaleFactor;
 
                     ctx.clearRect(0, 0, width, height);
                     ctx.save();
@@ -70,8 +84,8 @@ Item {
                         angle = angle * Math.PI / 180;
 
                         var isMajor = (Math.abs(tickValue - Math.round(tickValue)) < 0.001);
-                        var lineWidth = isMajor ? 4 : 2;
-                        var lineLength = isMajor ? 18 : 9;
+                        var lineWidth = (isMajor ? 4 : 2) * rpmMeter.scaleFactor;
+                        var lineLength = (isMajor ? 18 : 9) * rpmMeter.scaleFactor;
 
                         var startX = radius * Math.cos(angle);
                         var startY = radius * Math.sin(angle);
@@ -89,10 +103,11 @@ Item {
                         ctx.stroke();
 
                         if (isMajor) {
-                            var labelRadius = radius - 31.5;
+                            var labelRadius = radius - 31.5 * rpmMeter.scaleFactor;
                             var labelX = labelRadius * Math.cos(angle);
-                            var labelY = labelRadius * Math.sin(angle) + 4.5;
-                            ctx.font = "bold 12.6px sans-serif";
+                            var labelY = labelRadius * Math.sin(angle) + 4.5 * rpmMeter.scaleFactor;
+                            var fontSize = Math.max(9, 12.6 * rpmMeter.scaleFactor);
+                            ctx.font = "bold " + fontSize + "px sans-serif";
                             ctx.fillStyle = rpmMeter.getRpmColor(tickValue);
                             ctx.textAlign = "center";
                             ctx.textBaseline = "middle";
@@ -111,7 +126,7 @@ Item {
                     var ctx = getContext("2d");
                     var centerX = width / 2;
                     var centerY = height / 2;
-                    var radius = 90;
+                    var radius = 90 * rpmMeter.scaleFactor;
 
                     ctx.clearRect(0, 0, width, height);
                     var currentGauge = rpmMeter.gaugeValue();
@@ -122,19 +137,19 @@ Item {
                     var needleY = radius * Math.sin(angle);
 
                     ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
-                    ctx.shadowBlur = 5;
-                    ctx.shadowOffsetX = 2;
-                    ctx.shadowOffsetY = 2;
+                    ctx.shadowBlur = 5 * rpmMeter.scaleFactor;
+                    ctx.shadowOffsetX = 2 * rpmMeter.scaleFactor;
+                    ctx.shadowOffsetY = 2 * rpmMeter.scaleFactor;
 
                     ctx.strokeStyle = rpmMeter.getRpmColor(currentGauge);
-                    ctx.lineWidth = 4;
+                    ctx.lineWidth = 4 * rpmMeter.scaleFactor;
                     ctx.beginPath();
                     ctx.moveTo(centerX, centerY);
                     ctx.lineTo(centerX + needleX, centerY + needleY);
                     ctx.stroke();
 
                     ctx.beginPath();
-                    ctx.arc(centerX, centerY, 7.2, 0, 2 * Math.PI);
+                    ctx.arc(centerX, centerY, 7.2 * rpmMeter.scaleFactor, 0, 2 * Math.PI);
                     ctx.fillStyle = rpmMeter.getRpmColor(currentGauge);
                     ctx.fill();
                 }
@@ -144,12 +159,12 @@ Item {
                 id: rpmText
                 text: rpmMeter.rpm.toString() + " rpm"
                 color: rpmMeter.getRpmColor(rpmMeter.gaugeValue())
-                font.pixelSize: 22
+                font.pixelSize: Math.max(14, 22 * rpmMeter.scaleFactor)
                 font.bold: true
                 anchors {
                     bottom: parent.bottom
                     horizontalCenter: parent.horizontalCenter
-                    bottomMargin: 2  // Reduced margin to bring text closer
+                    bottomMargin: 2 * rpmMeter.scaleFactor
                 }
             }
 
@@ -162,12 +177,12 @@ Item {
                     return "Danger";
                 }
                 color: rpmMeter.getRpmColor(rpmMeter.gaugeValue())
-                font.pixelSize: 12
+                font.pixelSize: Math.max(9, 12 * rpmMeter.scaleFactor)
                 font.bold: true
                 anchors {
                     top: rpmText.bottom
                     horizontalCenter: parent.horizontalCenter
-                    topMargin: 2
+                    topMargin: 2 * rpmMeter.scaleFactor
                 }
             }
         }

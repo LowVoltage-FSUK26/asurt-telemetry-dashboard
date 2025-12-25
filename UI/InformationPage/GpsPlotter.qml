@@ -5,8 +5,12 @@ import QtPositioning
 
 Rectangle {
     id: gpsDisplay
-    width: parent.width - 30
-    height: parent.height - 50
+    
+    // Scale factor for responsive sizing
+    property real scaleFactor: 1.0
+    
+    width: parent ? parent.width - 30 * scaleFactor : 300
+    height: parent ? parent.height - 50 * scaleFactor : 400
 
     // These properties hold the raw GPS values from udpClient
     property real gpsLongitude: 0.0
@@ -64,7 +68,7 @@ Rectangle {
         // Modified MapPolyline for better visibility
         MapPolyline {
             id: pathLine
-            line.width: 4
+            line.width: 4 * scaleFactor
             line.color: "blue"
             path: gpsDisplay.pathCoordinates
         }
@@ -76,8 +80,8 @@ Rectangle {
             anchorPoint.y: marker.height
             sourceItem: Image {
                 id: marker
-                width: 20
-                height: 20
+                width: Math.max(15, 20 * scaleFactor)
+                height: Math.max(15, 20 * scaleFactor)
                 source: "../Assets/marker.png"
                 z : 2
             }
@@ -85,27 +89,30 @@ Rectangle {
     }
 
     Row {
-        spacing: 10
+        spacing: 10 * scaleFactor
         anchors.top: parent.top
         anchors.right: parent.right
-        anchors.topMargin: 10
-        anchors.rightMargin: 10
+        anchors.topMargin: 10 * scaleFactor
+        anchors.rightMargin: 10 * scaleFactor
         Button {
             text: "+"
-            width: 20
-            height: 20
+            width: Math.max(18, 20 * scaleFactor)
+            height: Math.max(18, 20 * scaleFactor)
+            font.pixelSize: Math.max(10, 14 * scaleFactor)
             onClicked: map.zoomLevel = Math.min(map.zoomLevel + 1, 20)
         }
         Button {
             text: "-"
-            width: 20
-            height: 20
+            width: Math.max(18, 20 * scaleFactor)
+            height: Math.max(18, 20 * scaleFactor)
+            font.pixelSize: Math.max(10, 14 * scaleFactor)
             onClicked: map.zoomLevel = Math.max(map.zoomLevel - 1, 2)
         }
         Button {
             text: "Clear"
-            width: 50
-            height: 20
+            width: Math.max(40, 50 * scaleFactor)
+            height: Math.max(18, 20 * scaleFactor)
+            font.pixelSize: Math.max(10, 12 * scaleFactor)
             onClicked: {
                 gpsDisplay.pathCoordinates = [];
                 gpsDisplay.firstCoordinateReceived = false;

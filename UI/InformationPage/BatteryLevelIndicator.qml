@@ -12,8 +12,8 @@ Item {
         Image {
             id: batteryIcon
             source: (root.batteryLevel > 30) ? "../Assets/batteryIcon_blue.png" : "../Assets/batteryIcon.png"
-            width: 30
-            height: 30
+            width: Math.max(20, 30 * root.scaleFactor)
+            height: Math.max(20, 30 * root.scaleFactor)
             fillMode: Image.PreserveAspectFit
             smooth: true
         }
@@ -22,15 +22,15 @@ Item {
             text: root.batteryLevel + "%"
             color: batteryIndicator.getColorForBattery(root.batteryLevel)
             font {
-                pixelSize: 20 * root.scaleFactor
+                pixelSize: Math.max(14, 20 * root.scaleFactor)
                 bold: true
                 family: "DS-Digital"
             }
         }
         Item {
             id: batteryIndicator
-            width: 200 * root.scaleFactor
-            height: 100 * root.scaleFactor
+            width: Math.max(140, 200 * root.scaleFactor)
+            height: Math.max(70, 100 * root.scaleFactor)
             function getColorForBattery(level) {
                 var r = Math.floor(255 * (1 - level / 100));
                 var g = Math.floor(255 * (level / 100));
@@ -41,21 +41,24 @@ Item {
                 id: batteryCanvas
                 anchors.fill: parent
                 anchors.centerIn: parent
+                
                 onPaint: {
                     var ctx = getContext("2d");
                     var width = batteryCanvas.width / 5;
                     var height = batteryCanvas.height;
                     var barHeight = (height / 10);
                     var numberOfBars = 10;
-                    ctx.clearRect(0, 0, width, height);
+                    ctx.clearRect(0, 0, batteryCanvas.width, height);
                     var barColor = batteryIndicator.getColorForBattery(root.batteryLevel);
                     for (var i = 0; i < numberOfBars; i++) {
                         var yPosition = i * barHeight;
                         ctx.fillStyle = (i < Math.ceil((100 - root.batteryLevel) / 10)) ? "black" : barColor;
-                        ctx.fillRect(0, yPosition, width, barHeight - 2);
+                        ctx.fillRect(0, yPosition, width, barHeight - 2 * root.scaleFactor);
                     }
                 }
             }
+            
+            onScaleFactorChanged: batteryCanvas.requestPaint()
         }
         Connections {
             target: communicationManager

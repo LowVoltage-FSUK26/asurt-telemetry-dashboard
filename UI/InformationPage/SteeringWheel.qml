@@ -9,12 +9,12 @@ Item {
     Text {
         anchors {
             bottom: steeringwheel.top
-            bottomMargin: -1
+            bottomMargin: -1 * scaleFactor
             horizontalCenter: parent.horizontalCenter
         }
         text: "Steering Angle: " + root.encoderAngle + "°"
         font {
-            pixelSize: 20 * root.scaleFactor
+            pixelSize: Math.max(14, 20 * root.scaleFactor)
             family: "DS-Digital"
         }
         color: "turquoise"
@@ -25,8 +25,8 @@ Item {
         source: "../Assets/Steering_wheel.png"
         rotation: root.encoderAngle
         anchors.centerIn: parent
-        width: 190 * root.scaleFactor
-        height: 160 * root.scaleFactor
+        width: Math.max(120, 190 * root.scaleFactor)
+        height: Math.max(100, 160 * root.scaleFactor)
         fillMode: Image.PreserveAspectFit
         smooth: true
     }

@@ -6,8 +6,8 @@ import "../.."
 Rectangle {
     id: root
 
-    // Add properties to receive data from WelcomeScreen
-    property real scaleFactor: 1.0
+    // Dynamic scale factor based on parent dimensions vs design size (1400x780)
+    property real scaleFactor: parent ? Math.min(parent.width / 1400, parent.height / 780) : 1.0
     property string sessionName: ""
     property string portNumber: ""
     property string portName: ""
@@ -16,14 +16,14 @@ Rectangle {
 
     color: "#1A3438"
     anchors.fill: parent
-    radius: 40
+    radius: Math.max(25, 40 * scaleFactor)
     border.color: "#A6F1E0"
-    border.width: 5
+    border.width: Math.max(3, 5 * scaleFactor)
 
     // Add Timer component for auto-navigation
     Timer {
         id: navigationTimer
-        interval: 2000  // 10 seconds
+        interval: 2000  // 2 seconds
         running: true    // Start timer automatically when the page loads
         repeat: false    // Run only once
         onTriggered: {
@@ -43,12 +43,12 @@ Rectangle {
         font {
             family: "Amiri"
             bold: true
-            pixelSize: 30 * root.scaleFactor
+            pixelSize: Math.max(20, 30 * root.scaleFactor)
         }
         anchors {
             horizontalCenter: parent.horizontalCenter
             bottom: busyIndicator.top
-            bottomMargin: 10
+            bottomMargin: 10 * scaleFactor
         }
         color: "turquoise"
     }
@@ -56,12 +56,13 @@ Rectangle {
     BusyIndicator {
         id: busyIndicator
         anchors.centerIn: parent
-        width: 70
-        height: 60
+        width: Math.max(50, 70 * scaleFactor)
+        height: Math.max(40, 60 * scaleFactor)
     }
 
     StatusBar {
         id: statusBar
+        scaleFactor: root.scaleFactor
         nameofsession : root.sessionName
         nameOfport : root.isSerialSource ? root.portName + " (" + root.baudRate + ")" : root.portNumber
 
@@ -72,11 +73,14 @@ Rectangle {
         source: "../Assets/back-button.png"
         hoverText: "Back"
         smooth: true
+        width: Math.max(30, 48 * scaleFactor)
+        height: Math.max(30, 48 * scaleFactor)
+        fillMode: Image.PreserveAspectFit
         anchors {
             left: parent.left
-            leftMargin: 12
+            leftMargin: 12 * scaleFactor
             bottom: parent.bottom
-            bottomMargin: 40
+            bottomMargin: 40 * scaleFactor
         }
         onClicked: {
                    navigationTimer.stop();
@@ -91,13 +95,13 @@ Rectangle {
         font {
             family: "DS-Digital"
             bold: true
-            pixelSize: 18
+            pixelSize: Math.max(12, 18 * scaleFactor)
         }
         color: "turquoise"
         anchors {
             horizontalCenter: backButton.horizontalCenter
             top: backButton.bottom
-            topMargin: 5
+            topMargin: 5 * scaleFactor
         }
     }
 }

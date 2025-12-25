@@ -2,8 +2,13 @@ import QtQuick 2.15
 
 Rectangle {
     id: root
-    width: 120 * scaleFactor
-    height: 25 * scaleFactor
+    
+    // Scale factor for responsive sizing
+    property real scaleFactor: 1.0
+    
+    // Scaled dimensions with minimums
+    width: Math.max(80, 120 * scaleFactor)
+    height: Math.max(18, 25 * scaleFactor)
     color: "black"
     border.color: "transparent"
     border.width: 2
@@ -11,7 +16,6 @@ Rectangle {
     property int pedalPosition: 0
     property real smoothedPosition: pedalPosition
     property int totalBars: 20
-    property real scaleFactor: 1.0
 
 
     Behavior on smoothedPosition {
@@ -25,7 +29,7 @@ Rectangle {
         model: root.totalBars
         delegate: Rectangle {
             id: bar
-            width: 5
+            width: Math.max(3, 5 * scaleFactor)
             height: parent.height
             property bool shouldBeActive: index <= Math.floor(root.smoothedPosition / (100 / root.totalBars))
             color: shouldBeActive ? "red" : "black"
@@ -66,7 +70,7 @@ Rectangle {
             horizontalCenter: parent.horizontalCenter
         }
         text: "Accelerator " + Math.round(root.smoothedPosition) + " %"
-        font.pixelSize: 14
+        font.pixelSize: Math.max(10, 14 * scaleFactor)
         font.family: "DS-Digital"
         font.bold: true
         opacity: root.smoothedPosition > 0 ? 1 : 0.7

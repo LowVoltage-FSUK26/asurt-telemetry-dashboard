@@ -6,12 +6,14 @@ import "../.."
 Rectangle {
     id: root
 
-    property real scaleFactor: 1.0
+    // Dynamic scale factor based on parent dimensions vs design size (1400x780)
+    property real scaleFactor: parent ? Math.min(parent.width / 1400, parent.height / 780) : 1.0
+    
     color: "#1A3438"
     anchors.fill: parent
-    radius: 40
+    radius: Math.max(25, 40 * scaleFactor)
     border.color: "#A6F1E0"
-    border.width: 5
+    border.width: Math.max(3, 5 * scaleFactor)
 
     // Settings component for persistent storage
     Settings {
@@ -41,13 +43,13 @@ Rectangle {
         id: row
         anchors.fill: parent
         anchors {
-            rightMargin: 10
-            leftMargin: 70
-            topMargin: 3
-            bottomMargin: 3
+            rightMargin: 10 * scaleFactor
+            leftMargin: Math.max(40, 70 * scaleFactor)
+            topMargin: 3 * scaleFactor
+            bottomMargin: 3 * scaleFactor
         }
 
-        spacing: 10
+        spacing: 10 * scaleFactor
 
         /**** Left Rectangle ****/
 
@@ -56,7 +58,7 @@ Rectangle {
             width: parent.width / 3
             height: parent.height - 8 * root.scaleFactor
             color: "#09122C"
-            radius: 30
+            radius: Math.max(20, 30 * scaleFactor)
             border.width: 1.5
             border.color: "#D84040"
 
@@ -65,15 +67,15 @@ Rectangle {
             Image {
                 id: carImg
                 source: "../Assets/CAR-215-ASURT.png"
-                width: 300 * root.scaleFactor
-                height: 200 * root.scaleFactor
+                width: Math.max(180, 300 * root.scaleFactor)
+                height: Math.max(120, 200 * root.scaleFactor)
                 fillMode: Image.PreserveAspectFit
                 smooth: true
 
                 anchors {
                     top: formulalogo.top
                     horizontalCenter: parent.horizontalCenter
-                    topMargin: 40
+                    topMargin: 40 * scaleFactor
                 }
             }
 
@@ -82,27 +84,27 @@ Rectangle {
             Image {
                 id: formulalogo
                 source: "../Assets/formulalogo.jpeg"
-                width: 200
-                height: 60
+                width: Math.max(120, 200 * scaleFactor)
+                height: Math.max(36, 60 * scaleFactor)
                 fillMode: Image.PreserveAspectFit
                 smooth: true
                 anchors {
                     top: parent.top
                     left: parent.left
-                    leftMargin: 10
-                    topMargin : 3
+                    leftMargin: 10 * scaleFactor
+                    topMargin : 3 * scaleFactor
                 }
             }
 
             /**** Layout for the Components of this Rectangle ****/
 
             Column {
-                spacing: 5
+                spacing: Math.max(3, 5 * scaleFactor)
 
                 anchors {
                     horizontalCenter: parent.horizontalCenter
                     top: carImg.bottom
-                    topMargin: 10
+                    topMargin: 10 * scaleFactor
                 }
 
                 /**** Field to Get Session Name ****/
@@ -112,7 +114,7 @@ Rectangle {
                     text: "Please Enter Session details"
                     font {
                         family: "DS-Digital"
-                        pixelSize: 18 * root.scaleFactor
+                        pixelSize: Math.max(12, 18 * root.scaleFactor)
                         bold: true
                     }
 
@@ -124,7 +126,7 @@ Rectangle {
                     id: sessionName
                     text: "Enter Session Name : "
                     font {
-                        pixelSize: 13 * root.scaleFactor
+                        pixelSize: Math.max(10, 13 * root.scaleFactor)
                         bold: true
                     }
 
@@ -137,19 +139,19 @@ Rectangle {
                     placeholderText: startButton.inValid_Name ? "Don't Leave This Empty!" : "Enter Session Name (e.g, Test)"
                     placeholderTextColor: startButton.inValid_Name ? "darkRed" : "turquoise"
 
-                    width: 300 * root.scaleFactor
-                    height: 25 * root.scaleFactor
+                    width: Math.max(200, 300 * root.scaleFactor)
+                    height: Math.max(20, 25 * root.scaleFactor)
 
-                    font.pointSize: 11 * root.scaleFactor
+                    font.pointSize: Math.max(8, 11 * root.scaleFactor)
                     verticalAlignment: TextInput.AlignVCenter
                     anchors.horizontalCenter: parent.horizontalCenter
                     color: "white"
 
                     background: Rectangle {
                         color: "#636363"
-                        radius: 50
+                        radius: 50 * scaleFactor
                         border.color: parent.activeFocus ? "turquoise" : startButton.inValid_Name ? "darkRed" : "transparent"
-                        border.width: 4
+                        border.width: Math.max(2, 4 * scaleFactor)
                     }
                 }
 
@@ -160,7 +162,7 @@ Rectangle {
                     text: "Enter Borker Address"
                     font {
                         bold: true
-                        pixelSize: 13 * root.scaleFactor
+                        pixelSize: Math.max(10, 13 * root.scaleFactor)
                     }
                     anchors {
                         left: parent.left
@@ -174,19 +176,19 @@ Rectangle {
                     placeholderText: startButton.inValid_Broker ? "Don't Leave This Empty!" : "Enter Broker Address (e.g., localhost)"
                     placeholderTextColor: startButton.inValid_Broker ? "darkRed" : "turquoise"
 
-                    width: 300 * root.scaleFactor
-                    height: 25 * root.scaleFactor
+                    width: Math.max(200, 300 * root.scaleFactor)
+                    height: Math.max(20, 25 * root.scaleFactor)
 
-                    font.pointSize: 12 * root.scaleFactor
+                    font.pointSize: Math.max(8, 12 * root.scaleFactor)
                     verticalAlignment: TextInput.AlignVCenter
                     anchors.horizontalCenter: parent.horizontalCenter
                     color: "white"
 
                     background: Rectangle {
                         color: "#636363"
-                        radius: 50
+                        radius: 50 * scaleFactor
                         border.color: parent.activeFocus ? "turquoise" : startButton.inValid_Broker ? "darkRed" : "transparent"
-                        border.width: 4
+                        border.width: Math.max(2, 4 * scaleFactor)
                     }
                 }
 
@@ -196,7 +198,7 @@ Rectangle {
                     text: "Choose Port:"
                     font {
                         bold: true
-                        pixelSize: 13 * root.scaleFactor
+                        pixelSize: Math.max(10, 13 * root.scaleFactor)
                     }
                     anchors {
                         left: parent.left
@@ -210,19 +212,19 @@ Rectangle {
                     placeholderText: startButton.inValid_Port ? "Don't Leave This Empty!" : "Enter Port (e.g. , 8080)"
                     placeholderTextColor: startButton.inValid_Port ? "darkRed" : "turquoise"
 
-                    width: 300 * root.scaleFactor
-                    height: 25 * root.scaleFactor
+                    width: Math.max(200, 300 * root.scaleFactor)
+                    height: Math.max(20, 25 * root.scaleFactor)
 
-                    font.pointSize: 12 * root.scaleFactor
+                    font.pointSize: Math.max(8, 12 * root.scaleFactor)
                     verticalAlignment: TextInput.AlignVCenter
                     anchors.horizontalCenter: parent.horizontalCenter
                     color: "white"
 
                     background: Rectangle {
                         color: "#636363"
-                        radius: 50
+                        radius: 50 * scaleFactor
                         border.color: parent.activeFocus ? "turquoise" : startButton.inValid_Port ? "darkRed" : "transparent"
-                        border.width: 4
+                        border.width: Math.max(2, 4 * scaleFactor)
                     }
                 }
 
@@ -234,7 +236,7 @@ Rectangle {
                     text : "Select the Protocol"
                     font {
                         bold: true
-                        pixelSize: 13 * root.scaleFactor
+                        pixelSize: Math.max(10, 13 * root.scaleFactor)
                     }
                     anchors {
                         left: parent.left
@@ -247,39 +249,39 @@ Rectangle {
                     visible: mqttradio.checked
                     model: ["MQTT over TCP", "MQTT over TLS"]
                     currentIndex: 0
-                    width: 300 * root.scaleFactor
-                    height: 25 * root.scaleFactor
+                    width: Math.max(200, 300 * root.scaleFactor)
+                    height: Math.max(20, 25 * root.scaleFactor)
 
-                    font.pointSize: 12 * root.scaleFactor
+                    font.pointSize: Math.max(8, 12 * root.scaleFactor)
                     anchors.horizontalCenter: parent.horizontalCenter
 
                     contentItem: Text {
                         text: mqttProtocolField.displayText
                         color: "turquoise"
-                        font.pointSize: 12 * root.scaleFactor
+                        font.pointSize: Math.max(8, 12 * root.scaleFactor)
                         verticalAlignment: Text.AlignVCenter
                         anchors.left: parent.left
-                        anchors.leftMargin: 20
+                        anchors.leftMargin: 20 * scaleFactor
                     }
 
                     background: Rectangle {
                         color: "#636363"
-                        radius: 100
+                        radius: 100 * scaleFactor
                         border.color: parent.activeFocus ? "turquoise" : "transparent"
-                        border.width: 4
+                        border.width: Math.max(2, 4 * scaleFactor)
                     }
 
                     delegate: ItemDelegate {
                         background: Rectangle {
                             id: mqttItemBackground
-                            width: 300 * root.scaleFactor
+                            width: Math.max(200, 300 * root.scaleFactor)
                             color: "#636363"
                         }
 
                         contentItem: Text {
                             text: modelData
                             color: "turquoise"
-                            font.pointSize: 11 * root.scaleFactor
+                            font.pointSize: Math.max(8, 11 * root.scaleFactor)
                         }
 
                         MouseArea {
@@ -307,7 +309,7 @@ Rectangle {
                     text: "Enter Client ID:"
                     font {
                         bold: true
-                        pixelSize: 13 * root.scaleFactor
+                        pixelSize: Math.max(10, 13 * root.scaleFactor)
                     }
                     anchors {
                         left: parent.left
@@ -320,10 +322,10 @@ Rectangle {
                     visible: mqttradio.checked
                     placeholderText: "Enter Client ID"
                     placeholderTextColor: "turquoise"
-                    width: 300 * root.scaleFactor
-                    height: 25 * root.scaleFactor
+                    width: Math.max(200, 300 * root.scaleFactor)
+                    height: Math.max(20, 25 * root.scaleFactor)
 
-                    font.pointSize: 12 * root.scaleFactor
+                    font.pointSize: Math.max(8, 12 * root.scaleFactor)
                     verticalAlignment: TextInput.AlignVCenter
                     anchors.horizontalCenter: parent.horizontalCenter
 
@@ -331,9 +333,9 @@ Rectangle {
 
                     background: Rectangle {
                         color: "#636363"
-                        radius: 50
+                        radius: 50 * scaleFactor
                         border.color: parent.activeFocus ? "turquoise" : "transparent"
-                        border.width: 4
+                        border.width: Math.max(2, 4 * scaleFactor)
                     }
                 }
 
@@ -346,7 +348,7 @@ Rectangle {
                     text: "Enter Username:"
                     font {
                         bold: true
-                        pixelSize: 13 * root.scaleFactor
+                        pixelSize: Math.max(10, 13 * root.scaleFactor)
                     }
                     anchors {
                         left: parent.left
@@ -360,19 +362,19 @@ Rectangle {
                     placeholderText: "Enter Username (e.g, John)"
                     placeholderTextColor: "turquoise"
 
-                    width: 300 * root.scaleFactor
-                    height: 25 * root.scaleFactor
+                    width: Math.max(200, 300 * root.scaleFactor)
+                    height: Math.max(20, 25 * root.scaleFactor)
 
-                    font.pointSize: 12 * root.scaleFactor
+                    font.pointSize: Math.max(8, 12 * root.scaleFactor)
                     verticalAlignment: TextInput.AlignVCenter
                     anchors.horizontalCenter: parent.horizontalCenter
                     color: "white"
 
                     background: Rectangle {
                         color: "#636363"
-                        radius: 50
+                        radius: 50 * scaleFactor
                         border.color: parent.activeFocus ? "turquoise" : "transparent"
-                        border.width: 4
+                        border.width: Math.max(2, 4 * scaleFactor)
                     }
                 }
 
@@ -385,7 +387,7 @@ Rectangle {
                     text: "Enter Password:"
                     font {
                         bold: true
-                        pixelSize: 13 * root.scaleFactor
+                        pixelSize: Math.max(10, 13 * root.scaleFactor)
                     }
                     anchors {
                         left: parent.left
@@ -395,12 +397,12 @@ Rectangle {
 
                 Rectangle {
                     visible: mqttradio.checked
-                    width: 300 * root.scaleFactor
-                    height: 25 * root.scaleFactor
+                    width: Math.max(200, 300 * root.scaleFactor)
+                    height: Math.max(20, 25 * root.scaleFactor)
                     color: "#636363"
-                    radius: 50
+                    radius: 50 * scaleFactor
                     border.color: mqttPasswordField.activeFocus ? "turquoise" : "transparent"
-                    border.width: 4
+                    border.width: Math.max(2, 4 * scaleFactor)
                     anchors.horizontalCenter: parent.horizontalCenter
 
                     TextField {
@@ -409,13 +411,13 @@ Rectangle {
                             left: parent.left
                             right: showPasswordCheck.left
                             verticalCenter: parent.verticalCenter
-                            rightMargin: 10
+                            rightMargin: 10 * scaleFactor
                         }
                         height: parent.height
 
                         placeholderText: "Enter Password"
                         placeholderTextColor: "turquoise"
-                        font.pointSize: 11 * root.scaleFactor
+                        font.pointSize: Math.max(8, 11 * root.scaleFactor)
                         verticalAlignment: TextInput.AlignVCenter
                         echoMode: showPasswordCheck.checked ? TextInput.Normal : TextInput.Password
                         color: "white"
@@ -430,22 +432,22 @@ Rectangle {
                         anchors {
                             right: parent.right
                             verticalCenter: parent.verticalCenter
-                            rightMargin: 5
+                            rightMargin: 5 * scaleFactor
                         }
-                        width: 20
-                        height: 20
+                        width: Math.max(16, 20 * scaleFactor)
+                        height: Math.max(16, 20 * scaleFactor)
 
                         indicator: Rectangle {
-                            width: 16
-                            height: 16
-                            radius: 3
+                            width: Math.max(12, 16 * scaleFactor)
+                            height: Math.max(12, 16 * scaleFactor)
+                            radius: 3 * scaleFactor
                             border.color: "turquoise"
                             border.width: 1
                             color: showPasswordCheck.checked ? "turquoise" : "transparent"
 
                             Text {
                                 text: "👁"
-                                font.pixelSize: 10
+                                font.pixelSize: Math.max(8, 10 * scaleFactor)
                                 color: "white"
                                 anchors.centerIn: parent
                                 visible: showPasswordCheck.checked
@@ -462,7 +464,7 @@ Rectangle {
                     text: "Enter Topic:"
                     font {
                         bold: true
-                        pixelSize: 13 * root.scaleFactor
+                        pixelSize: Math.max(10, 13 * root.scaleFactor)
                     }
                     anchors {
                         left: parent.left
@@ -475,19 +477,19 @@ Rectangle {
                     visible: mqttradio.checked
                     placeholderText: startButton.inValid_Topic ? "Don't Leave This Empty!" : "Enter Topic (e.g., ASURT/Sensors)"
                     placeholderTextColor: startButton.inValid_Topic ? "darkRed" : "turquoise"
-                    width: 300 * root.scaleFactor
-                    height: 25 * root.scaleFactor
+                    width: Math.max(200, 300 * root.scaleFactor)
+                    height: Math.max(20, 25 * root.scaleFactor)
 
-                    font.pointSize: 12 * root.scaleFactor
+                    font.pointSize: Math.max(8, 12 * root.scaleFactor)
                     verticalAlignment: TextInput.AlignVCenter
                     anchors.horizontalCenter: parent.horizontalCenter
                     color: "white"
 
                     background: Rectangle {
                         color: "#636363"
-                        radius: 50
+                        radius: 50 * scaleFactor
                         border.color: parent.activeFocus ? "turquoise" : startButton.inValid_Topic ? "darkRed" : "transparent"
-                        border.width: 4
+                        border.width: Math.max(2, 4 * scaleFactor)
                     }
                 }
 
@@ -501,39 +503,39 @@ Rectangle {
                     visible: serialradio.checked
                     model: ["COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9", "COM10", "COM11", "COM12"]
                     currentIndex: 2
-                    width: 300 * root.scaleFactor
-                    height: 25 * root.scaleFactor
+                    width: Math.max(200, 300 * root.scaleFactor)
+                    height: Math.max(20, 25 * root.scaleFactor)
 
-                    font.pointSize: 12 * root.scaleFactor
+                    font.pointSize: Math.max(8, 12 * root.scaleFactor)
                     anchors.horizontalCenter: parent.horizontalCenter
 
                     contentItem: Text {
                         text: serialPortField.displayText
                         color: "turquoise"
-                        font.pointSize: 13 * root.scaleFactor
+                        font.pointSize: Math.max(9, 13 * root.scaleFactor)
                         verticalAlignment: Text.AlignVCenter
                         anchors.left: parent.left
-                        anchors.leftMargin: 20
+                        anchors.leftMargin: 20 * scaleFactor
                     }
 
                     background: Rectangle {
                         color: "#636363"
-                        radius: 100
+                        radius: 100 * scaleFactor
                         border.color: parent.activeFocus ? "turquoise" : "transparent"
-                        border.width: 4
+                        border.width: Math.max(2, 4 * scaleFactor)
                     }
 
                     delegate: ItemDelegate {
                         background: Rectangle {
                             id: itemBackground
-                            width: 300 * root.scaleFactor
+                            width: Math.max(200, 300 * root.scaleFactor)
                             color: "#636363"
                         }
 
                         contentItem: Text {
                             text: modelData
                             color: "turquoise"
-                            font.pointSize: 11 * root.scaleFactor
+                            font.pointSize: Math.max(8, 11 * root.scaleFactor)
                         }
 
                         MouseArea {
@@ -562,7 +564,7 @@ Rectangle {
                     text: "Select Baud Rate:"
                     font {
                         bold: true
-                        pixelSize: 13 * root.scaleFactor
+                        pixelSize: Math.max(10, 13 * root.scaleFactor)
                     }
                     anchors {
                         left: parent.left
@@ -575,39 +577,39 @@ Rectangle {
                     visible: serialradio.checked
                     model: ["9600", "57600", "115200"]
                     currentIndex: 2
-                    width: 300 * root.scaleFactor
-                    height: 25 * root.scaleFactor
+                    width: Math.max(200, 300 * root.scaleFactor)
+                    height: Math.max(20, 25 * root.scaleFactor)
 
-                    font.pointSize: 12 * root.scaleFactor
+                    font.pointSize: Math.max(8, 12 * root.scaleFactor)
                     anchors.horizontalCenter: parent.horizontalCenter
 
                     contentItem: Text {
                         text: serialBaudRate.displayText
                         color: "turquoise"
-                        font.pointSize: 13 * root.scaleFactor
+                        font.pointSize: Math.max(9, 13 * root.scaleFactor)
                         verticalAlignment: Text.AlignVCenter
                         anchors.left: parent.left
-                        anchors.leftMargin: 20
+                        anchors.leftMargin: 20 * scaleFactor
                     }
 
                     background: Rectangle {
                         color: "#636363"
-                        radius: 100
+                        radius: 100 * scaleFactor
                         border.color: parent.activeFocus ? "turquoise" : "transparent"
-                        border.width: 4
+                        border.width: Math.max(2, 4 * scaleFactor)
                     }
 
                     delegate: ItemDelegate {
                         background: Rectangle {
                             id: itemBackground1
-                            width: 300 * root.scaleFactor
+                            width: Math.max(200, 300 * root.scaleFactor)
                             color: "#636363"
                         }
 
                         contentItem: Text {
                             text: modelData
                             color: "turquoise"
-                            font.pointSize: 11 * root.scaleFactor
+                            font.pointSize: Math.max(8, 11 * root.scaleFactor)
                         }
 
                         MouseArea {
@@ -641,15 +643,15 @@ Rectangle {
 
                 source: "../Assets/powerButton.png"
                 hoverText: "Start Session"
-                width: 35 * root.scaleFactor
-                height: 35 * root.scaleFactor
+                width: Math.max(25, 35 * root.scaleFactor)
+                height: Math.max(25, 35 * root.scaleFactor)
                 fillMode: Image.PreserveAspectFit
                 smooth: true
 
                 anchors {
                     horizontalCenter: parent.horizontalCenter
                     bottom: parent.bottom
-                    bottomMargin: 35
+                    bottomMargin: Math.max(25, 35 * scaleFactor)
                 }
 
                 onClicked: {
@@ -736,13 +738,13 @@ Rectangle {
                 font {
                     family: "DS-Digital"
                     bold: true
-                    pixelSize: 18 * root.scaleFactor
+                    pixelSize: Math.max(12, 18 * root.scaleFactor)
                 }
                 color: "turquoise"
                 anchors {
                     horizontalCenter: parent.horizontalCenter
                     top: startButton.bottom
-                    topMargin: 5
+                    topMargin: 5 * scaleFactor
                 }
             }
         }
@@ -751,10 +753,10 @@ Rectangle {
 
         Rectangle {
             id: extraInfromationRect
-            width: (2 * parent.width / 3) - 50
+            width: (2 * parent.width / 3) - 50 * scaleFactor
             height: parent.height - 8 * root.scaleFactor
             color: "#09122C"
-            radius: 30
+            radius: Math.max(20, 30 * scaleFactor)
             border.width: 1.5
             border.color: "#D84040"
 
@@ -763,8 +765,8 @@ Rectangle {
             Image {
                 id: roadImg
                 source: "../Assets/road2.png"
-                width: 400 * root.scaleFactor
-                height: 400 * root.scaleFactor
+                width: Math.max(240, 400 * root.scaleFactor)
+                height: Math.max(240, 400 * root.scaleFactor)
                 fillMode: Image.PreserveAspectFit
                 smooth: true
                 anchors {
@@ -778,8 +780,8 @@ Rectangle {
             Image {
                 id: roadCarImg
                 source: "../Assets/car3_white.png"
-                width: 150 * root.scaleFactor
-                height: 150 * root.scaleFactor
+                width: Math.max(90, 150 * root.scaleFactor)
+                height: Math.max(90, 150 * root.scaleFactor)
                 fillMode: Image.PreserveAspectFit
                 smooth: true
                 anchors.centerIn: roadImg
@@ -790,8 +792,8 @@ Rectangle {
             Image {
                 id: racingTeamLogo
                 source: "../Assets/racinglogo.png"
-                width: 100 * root.scaleFactor
-                height: 100 * root.scaleFactor
+                width: Math.max(60, 100 * root.scaleFactor)
+                height: Math.max(60, 100 * root.scaleFactor)
                 fillMode: Image.PreserveAspectFit
                 smooth: true
 
@@ -799,8 +801,8 @@ Rectangle {
                     right: parent.right
                     top: parent.top
 
-                    topMargin: 10
-                    rightMargin: 10
+                    topMargin: 10 * scaleFactor
+                    rightMargin: 10 * scaleFactor
                 }
             }
 
@@ -811,9 +813,9 @@ Rectangle {
                 anchors {
                     left: parent.left
                     top: parent.top
-                    margins: 20
+                    margins: 20 * scaleFactor
                 }
-                spacing: 15
+                spacing: Math.max(10, 15 * scaleFactor)
 
                 /**** Field to Get Driver Name ****/
 
@@ -822,7 +824,7 @@ Rectangle {
                     text: "Extra Information"
                     font {
                         bold: true
-                        pixelSize: 16 * root.scaleFactor
+                        pixelSize: Math.max(12, 16 * root.scaleFactor)
                         family: "Amiri"
                     }
                     color: "turquoise"
@@ -831,7 +833,7 @@ Rectangle {
                     text: "Enter Driver Name:"
                     font {
                         bold: true
-                        pixelSize: 13 * root.scaleFactor
+                        pixelSize: Math.max(10, 13 * root.scaleFactor)
                         family: "Amiri"
                     }
                     anchors {
@@ -843,18 +845,18 @@ Rectangle {
                     id: driverNameField
                     placeholderText: "Enter Driver Name"
                     placeholderTextColor: "turquoise"
-                    width: 300 * root.scaleFactor
-                    height: 30 * root.scaleFactor
+                    width: Math.max(200, 300 * root.scaleFactor)
+                    height: Math.max(24, 30 * root.scaleFactor)
 
-                    font.pointSize: 12 * root.scaleFactor
+                    font.pointSize: Math.max(8, 12 * root.scaleFactor)
                     verticalAlignment: TextInput.AlignVCenter
                     anchors.left: parent.left
                     color: "white"
                     background: Rectangle {
                         color: "#636363"
-                        radius: 100
+                        radius: 100 * scaleFactor
                         border.color: parent.activeFocus ? "turquoise" : "transparent"
-                        border.width: 4
+                        border.width: Math.max(2, 4 * scaleFactor)
                     }
                 }
 
@@ -864,7 +866,7 @@ Rectangle {
                     text: "Enter Session Goals:"
                     font {
                         bold: true
-                        pixelSize: 13 * root.scaleFactor
+                        pixelSize: Math.max(10, 13 * root.scaleFactor)
                         family: "Amiri"
                     }
                     anchors {
@@ -874,19 +876,19 @@ Rectangle {
                 }
                 TextArea {
                     id: goalsField
-                    width: 350 * root.scaleFactor
-                    height: 250 * root.scaleFactor
+                    width: Math.max(220, 350 * root.scaleFactor)
+                    height: Math.max(150, 250 * root.scaleFactor)
                     wrapMode: Text.Wrap
                     placeholderText: "Write your goals here..."
                     placeholderTextColor: "turquoise"
-                    font.pointSize: 13 * root.scaleFactor
+                    font.pointSize: Math.max(9, 13 * root.scaleFactor)
                     anchors.horizontalCenter: parent.horizontalCenter
                     color: "white"
                     background: Rectangle {
                         color: "#636363"
-                        radius: 10
+                        radius: 10 * scaleFactor
                         border.color: parent.activeFocus ? "turquoise" : "transparent"
-                        border.width: 4
+                        border.width: Math.max(2, 4 * scaleFactor)
                     }
                 }
 
@@ -894,7 +896,7 @@ Rectangle {
                     text: "Choose type of Communication : "
                     font {
                         bold: true
-                        pixelSize: 15 * root.scaleFactor
+                        pixelSize: Math.max(11, 15 * root.scaleFactor)
                         family: "Amiri"
                     }
 
@@ -910,12 +912,12 @@ Rectangle {
                         font {
                             bold: true
                             family: "DS-Digital"
-                            pixelSize: 18 * root.scaleFactor
+                            pixelSize: Math.max(12, 18 * root.scaleFactor)
                         }
                         color: "white"
 
                         anchors.left: parent.right
-                        anchors.leftMargin: 5
+                        anchors.leftMargin: 5 * scaleFactor
                     }
                 }
 
@@ -928,12 +930,12 @@ Rectangle {
                         font {
                             bold: true
                             family: "DS-Digital"
-                            pixelSize: 18 * root.scaleFactor
+                            pixelSize: Math.max(12, 18 * root.scaleFactor)
                         }
                         color: "white"
 
                         anchors.left: parent.right
-                        anchors.leftMargin: 5
+                        anchors.leftMargin: 5 * scaleFactor
                     }
                 }
 
@@ -945,12 +947,12 @@ Rectangle {
                         font {
                             bold: true
                             family: "DS-Digital"
-                            pixelSize: 18 * root.scaleFactor
+                            pixelSize: Math.max(12, 18 * root.scaleFactor)
                         }
                         color: "white"
 
                         anchors.left: parent.right
-                        anchors.leftMargin: 5
+                        anchors.leftMargin: 5 * scaleFactor
                     }
                 }
             }
