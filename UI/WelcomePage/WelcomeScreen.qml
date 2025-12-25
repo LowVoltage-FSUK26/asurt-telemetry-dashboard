@@ -6,11 +6,10 @@ import "../.."
 Rectangle {
     id: root
 
-    // Dynamic scale factor based on parent dimensions vs design size (1400x780)
-    property real scaleFactor: parent ? Math.min(parent.width / 1400, parent.height / 780) : 1.0
+    // Dynamic scale factor based on dimensions vs design size (1400x780)
+    property real scaleFactor: Math.min(width / 1400, height / 780)
     
     color: "#1A3438"
-    anchors.fill: parent
     radius: Math.max(25, 40 * scaleFactor)
     border.color: "#A6F1E0"
     border.width: Math.max(3, 5 * scaleFactor)

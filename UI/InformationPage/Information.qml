@@ -163,8 +163,8 @@ Rectangle {
 
     Rectangle {
         id: metersScreen
-        // Proportional width and height
-        width: Math.max(500, (speedometer.width + rpmMeter.width - 45 * scaleFactor))
+        // Proportional width and height based on design size (675x335 at scale 1.0)
+        width: Math.max(500, 675 * scaleFactor)
         height: Math.max(280, 335 * scaleFactor)
         color: "#09122C"
         border.color: "#D84040"
@@ -173,9 +173,8 @@ Rectangle {
         anchors {
             top : statusBar.bottom
             topMargin: 8 * scaleFactor
-            left : leftRect.right
-            leftMargin : 70 * scaleFactor
-
+            // Center horizontally between leftRect and rightRect
+            horizontalCenter: parent.horizontalCenter
         }
 
         radius: Math.max(12, 20 * scaleFactor)
@@ -197,8 +196,6 @@ Rectangle {
             rpm: communicationManager ? communicationManager.rpm : 0
             anchors {
                 left: speedometer.right
-                right: parent.right
-                rightMargin: 30 * scaleFactor
                 verticalCenter: parent.verticalCenter
             }
         }
@@ -296,6 +293,18 @@ Rectangle {
 
         // Calculate diagram size based on available space
         property real diagramSize: Math.min(width * 0.85, height * 0.75, 294 * scaleFactor)
+        
+        // Track if we've received actual G-force data
+        property bool hasReceivedData: communicationManager.lateralG !== 0 || communicationManager.longitudinalG !== 0
+        
+        // Clear path when scale factor changes (on resize)
+        Connections {
+            target: root
+            function onScaleFactorChanged() {
+                pathTracker.pathPoints = []
+                polyline.path = []
+            }
+        }
 
         Image {
             id: ggImage
@@ -375,7 +384,7 @@ Rectangle {
         Timer {
             id: pathTracker
             interval: 100  // Update every 100ms
-            running: true
+            running: bottomRect.hasReceivedData  // Only run when we have actual G-force data
             repeat: true
 
             property var pathPoints: []

@@ -5,6 +5,8 @@ Item {
     property int batteryLevel: 0
     property real scaleFactor: 1.0
 
+    onScaleFactorChanged: batteryCanvas.requestPaint()
+
     Column {
         id: indicator
         anchors.centerIn: parent
@@ -40,7 +42,6 @@ Item {
             Canvas {
                 id: batteryCanvas
                 anchors.fill: parent
-                anchors.centerIn: parent
                 
                 onPaint: {
                     var ctx = getContext("2d");
@@ -57,13 +58,11 @@ Item {
                     }
                 }
             }
-            
-            onScaleFactorChanged: batteryCanvas.requestPaint()
         }
         Connections {
             target: communicationManager
-            onBatteryLevelChanged: {
-                batteryLevel = communicationManager ? communicationManager.batteryLevel : 0;
+            function onBatteryLevelChanged() {
+                root.batteryLevel = communicationManager ? communicationManager.batteryLevel : 0;
                 batteryCanvas.requestPaint();
             }
         }
