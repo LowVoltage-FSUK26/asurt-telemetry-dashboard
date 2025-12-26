@@ -14,9 +14,8 @@ MqttClient::MqttClient(QObject *parent)
       m_batteryLevel(0), m_gpsLongitude(0.0), m_gpsLatitude(0.0), m_speedFL(0),
       m_speedFR(0), m_speedBL(0), m_speedBR(0), m_lateralG(0.0),
       m_longitudinalG(0.0) {
-  // Initialize async logger with absolute path
-  AsyncLogger::instance().initialize(
-      "/home/mohamed-khaled/ASURT_GUI/Car_Dashboard/data/logs");
+  // Initialize async logger
+  AsyncLogger::instance().initialize("./logs");
 
   m_receiverWorker = new MqttReceiverWorker();
   m_receiverWorker->moveToThread(&m_receiverThread);
