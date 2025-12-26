@@ -208,6 +208,7 @@ Rectangle {
         id : pedalTempRect
         width : parent.width / 5.1
         height : parent.height / 3.5
+        clip: true  // Prevent content from overflowing
 
         color: "#09122C"
         border.color: "#D84040"
@@ -262,8 +263,8 @@ Rectangle {
             anchors {
                 right: parent.right
                 top: parent.top
-                rightMargin: 80 * scaleFactor
-                topMargin: 75 * scaleFactor
+                rightMargin: 10 * scaleFactor
+                topMargin: 10 * scaleFactor
             }
         }
     }
