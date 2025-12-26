@@ -13,7 +13,7 @@ Item {
         spacing: 2 * root.scaleFactor
         Image {
             id: batteryIcon
-            source: (root.batteryLevel > 30) ? "../Assets/batteryIcon_blue.png" : "../Assets/batteryIcon.png"
+            source: (root.batteryLevel > 30) ? "../../../Assets/batteryIcon_blue.png" : "../../../Assets/batteryIcon.png"
             width: Math.max(20, 30 * root.scaleFactor)
             height: Math.max(20, 30 * root.scaleFactor)
             fillMode: Image.PreserveAspectFit

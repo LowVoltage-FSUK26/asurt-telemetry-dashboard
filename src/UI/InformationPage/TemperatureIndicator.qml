@@ -8,7 +8,7 @@ Item {
 
     Image {
         id: temperatureIndicatorImage
-        source: "../Assets/thermometer.png"
+        source: "../../../Assets/thermometer.png"
         height: Math.max(50, 70 * scaleFactor)
         fillMode: Image.PreserveAspectFit
         smooth: true

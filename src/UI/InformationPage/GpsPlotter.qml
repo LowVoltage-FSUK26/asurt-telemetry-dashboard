@@ -82,7 +82,7 @@ Rectangle {
                 id: marker
                 width: Math.max(15, 20 * scaleFactor)
                 height: Math.max(15, 20 * scaleFactor)
-                source: "../Assets/marker.png"
+                source: "../../../Assets/marker.png"
                 z : 2
             }
         }

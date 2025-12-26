@@ -22,7 +22,7 @@ Item {
 
     Image {
         id: steeringwheel
-        source: "../Assets/Steering_wheel.png"
+        source: "../../../Assets/Steering_wheel.png"
         rotation: root.encoderAngle
         anchors.centerIn: parent
         width: Math.max(120, 190 * root.scaleFactor)

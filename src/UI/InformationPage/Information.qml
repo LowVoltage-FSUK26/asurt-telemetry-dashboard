@@ -95,7 +95,7 @@ Rectangle {
 
             Image {
                 id : car
-                source : "../Assets/AI_car_transparent.png"
+                source : "../../../Assets/AI_car_transparent.png"
                 anchors.centerIn : parent
                 height : parent.height - 30 * scaleFactor
                 fillMode : Image.PreserveAspectFit
@@ -308,7 +308,7 @@ Rectangle {
 
         Image {
             id: ggImage
-            source: "../Assets/GG_Diagram.png"
+            source: "../../../Assets/GG_Diagram.png"
             width: bottomRect.diagramSize
             height: bottomRect.diagramSize
             anchors.centerIn: parent
@@ -350,7 +350,7 @@ Rectangle {
             // Add the point marker
             Image {
                 id: pointImage
-                source: "../Assets/point.png"
+                source: "../../../Assets/point.png"
                 width: 20 * root.scaleFactor
                 height: 20 * root.scaleFactor
 
@@ -367,13 +367,13 @@ Rectangle {
                 Behavior on x {
                     SmoothedAnimation {
                         easing.type: Easing.InOutQuad
-                        velocity: 800
+                        velocity: 2000
                     }
                 }
                 Behavior on y {
                     SmoothedAnimation {
                         easing.type: Easing.InOutQuad
-                        velocity: 800
+                        velocity: 2000
                     }
                 }
 

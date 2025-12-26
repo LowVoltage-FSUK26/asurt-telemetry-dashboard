@@ -20,7 +20,7 @@ Window {
     StackView {
         id : stackView
         anchors.fill : parent
-        initialItem : "UI/WelcomePage/WelcomeScreen.qml"
+        initialItem : "src/UI/WelcomePage/WelcomeScreen.qml"
     }
 
 }

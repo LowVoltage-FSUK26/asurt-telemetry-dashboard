@@ -1,7 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Controls
 import Qt.labs.settings 1.0
-import "../.."
+import "../../.."
 
 Rectangle {
     id: root
@@ -65,7 +65,7 @@ Rectangle {
 
             Image {
                 id: carImg
-                source: "../Assets/CAR-215-ASURT.png"
+                source: "../../../Assets/CAR-215-ASURT.png"
                 width: Math.max(180, 300 * root.scaleFactor)
                 height: Math.max(120, 200 * root.scaleFactor)
                 fillMode: Image.PreserveAspectFit
@@ -82,7 +82,7 @@ Rectangle {
 
             Image {
                 id: formulalogo
-                source: "../Assets/formulalogo.jpeg"
+                source: "../../../Assets/formulalogo.jpeg"
                 width: Math.max(120, 200 * scaleFactor)
                 height: Math.max(36, 60 * scaleFactor)
                 fillMode: Image.PreserveAspectFit
@@ -640,7 +640,7 @@ Rectangle {
                 property bool inValid_Topic: false
 
 
-                source: "../Assets/powerButton.png"
+                source: "../../../Assets/powerButton.png"
                 hoverText: "Start Session"
                 width: Math.max(25, 35 * root.scaleFactor)
                 height: Math.max(25, 35 * root.scaleFactor)
@@ -763,7 +763,7 @@ Rectangle {
 
             Image {
                 id: roadImg
-                source: "../Assets/road2.png"
+                source: "../../../Assets/road2.png"
                 width: Math.max(240, 400 * root.scaleFactor)
                 height: Math.max(240, 400 * root.scaleFactor)
                 fillMode: Image.PreserveAspectFit
@@ -778,7 +778,7 @@ Rectangle {
 
             Image {
                 id: roadCarImg
-                source: "../Assets/car3_white.png"
+                source: "../../../Assets/car3_white.png"
                 width: Math.max(90, 150 * root.scaleFactor)
                 height: Math.max(90, 150 * root.scaleFactor)
                 fillMode: Image.PreserveAspectFit
@@ -790,7 +790,7 @@ Rectangle {
 
             Image {
                 id: racingTeamLogo
-                source: "../Assets/racinglogo.png"
+                source: "../../../Assets/racinglogo.png"
                 width: Math.max(60, 100 * root.scaleFactor)
                 height: Math.max(60, 100 * root.scaleFactor)
                 fillMode: Image.PreserveAspectFit

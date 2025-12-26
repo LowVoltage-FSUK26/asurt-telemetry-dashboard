@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import "../StatusBar"
-import "../.."
+import "../../.."
 
 Rectangle {
     id: root
@@ -69,7 +69,7 @@ Rectangle {
 
     MyButton {
         id: backButton
-        source: "../Assets/back-button.png"
+        source: "../../../Assets/back-button.png"
         hoverText: "Back"
         smooth: true
         width: Math.max(30, 48 * scaleFactor)

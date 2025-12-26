@@ -1,48 +1,43 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
-#include <Controllers/udp/include/udpclient.h>
-#include <Controllers/serial/include/serialmanager.h>
-#include <Controllers/communication_manager/include/communicationmanager.h>
-#include <Controllers/mqtt/include/mqttclient.h>
-#include <Controllers/logging/include/asynclogger.h>
 #include <QQmlContext>
 #include <QThread>
+#include <src/Controllers/communication_manager/include/communicationmanager.h>
+#include <src/Controllers/logging/include/asynclogger.h>
+#include <src/Controllers/mqtt/include/mqttclient.h>
+#include <src/Controllers/serial/include/serialmanager.h>
+#include <src/Controllers/udp/include/udpclient.h>
 
-int main(int argc, char *argv[])
-{
-    QGuiApplication app(argc, argv);
-    
-    // Set application information for QSettings
-    QCoreApplication::setOrganizationName("ASURT");
-    QCoreApplication::setOrganizationDomain("asurt.eu");
-    QCoreApplication::setApplicationName("Car_Dashboard");
+int main(int argc, char *argv[]) {
+  QGuiApplication app(argc, argv);
 
-    QQmlApplicationEngine engine;
-    UdpClient udpClient;
-    SerialManager serialManager;
-    MqttClient mqttClient;
-    CommunicationManager communicationManager;
+  // Set application information for QSettings
+  QCoreApplication::setOrganizationName("ASURT");
+  QCoreApplication::setOrganizationDomain("asurt.eu");
+  QCoreApplication::setApplicationName("Car_Dashboard");
 
-    engine.rootContext()->setContextProperty("communicationManager", &communicationManager);
+  QQmlApplicationEngine engine;
+  UdpClient udpClient;
+  SerialManager serialManager;
+  MqttClient mqttClient;
+  CommunicationManager communicationManager;
 
-    engine.rootContext()->setContextProperty("udpClient", &udpClient);
-    engine.rootContext()->setContextProperty("serialManager", &serialManager);
-    engine.rootContext()->setContextProperty("mqttClient", &mqttClient);
+  engine.rootContext()->setContextProperty("communicationManager",
+                                           &communicationManager);
 
-    QObject::connect(
-        &engine,
-        &QQmlApplicationEngine::objectCreationFailed,
-        &app,
-        []() { QCoreApplication::exit(-1); },
-        Qt::QueuedConnection);
-    engine.loadFromModule("GUI", "Main");
+  engine.rootContext()->setContextProperty("udpClient", &udpClient);
+  engine.rootContext()->setContextProperty("serialManager", &serialManager);
+  engine.rootContext()->setContextProperty("mqttClient", &mqttClient);
 
-    int result = app.exec();
-    
-    // Ensure proper cleanup before exit
-    AsyncLogger::instance().shutdown();
-    
-    return result;
+  QObject::connect(
+      &engine, &QQmlApplicationEngine::objectCreationFailed, &app,
+      []() { QCoreApplication::exit(-1); }, Qt::QueuedConnection);
+  engine.loadFromModule("GUI", "Main");
+
+  int result = app.exec();
+
+  // Ensure proper cleanup before exit
+  AsyncLogger::instance().shutdown();
+
+  return result;
 }
-
-
