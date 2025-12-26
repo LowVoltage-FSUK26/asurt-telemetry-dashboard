@@ -200,3 +200,7 @@ meta_types/
 # Foreign types
 qmltypes/
 
+# Documentation files
+doc/*
+!doc/*.pdf
+
