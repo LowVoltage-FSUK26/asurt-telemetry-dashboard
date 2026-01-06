@@ -337,13 +337,7 @@ void UdpClient::cleanupParsers()
     if (!m_parserPool.waitForDone(3000)) {
         qWarning() << "UDP parser pool did not finish in time";
     }
-
-    // Note: parsers are auto-deleted by thread pool after run() completes
-    // No need to disconnect - Qt automatically handles this when objects are
-    // destroyed. Attempting to disconnect here could cause use-after-free since
-    // parsers may already be deleted
-
-    // Clear the list (autoDelete already handled deletion)
+    
     m_parsers.clear();
 }
 
