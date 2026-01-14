@@ -193,8 +193,6 @@ void SerialParserWorker::parseData(const QByteArray &data) {
       s_tempFR = static_cast<int>(temps.temp_fr);
       s_tempBL = static_cast<int>(temps.temp_rl);
       s_tempBR = static_cast<int>(temps.temp_rr);
-      AsyncLogger::instance().logTemperature(temps.temp_fl, temps.temp_fr,
-                                             temps.temp_rl, temps.temp_rr);
       shouldEmit = true;
       break;
     }

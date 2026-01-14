@@ -20,7 +20,7 @@ class LoggerWorker;
  * requiring Qt metatype registration.
  */
 struct LogEntry {
-  enum Type { IMU, SUSPENSION, TEMPERATURE };
+  enum Type { IMU, SUSPENSION };
 
   // Default constructor required for Qt metatype system
   LogEntry() : type(IMU), timestamp(0) {}
@@ -51,10 +51,8 @@ private:
   QString m_logDirectory;
   QFile m_imuFile;
   QFile m_suspensionFile;
-  QFile m_temperatureFile;
   QTextStream m_imuStream;
   QTextStream m_suspensionStream;
-  QTextStream m_temperatureStream;
   bool m_filesOpen;
 
   bool openFiles();
@@ -98,12 +96,6 @@ public:
    */
   void logSuspension(uint16_t sus_1, uint16_t sus_2, uint16_t sus_3,
                      uint16_t sus_4);
-
-  /**
-   * @brief Log temperature data
-   */
-  void logTemperature(int16_t temp_fl, int16_t temp_fr, int16_t temp_rl,
-                      int16_t temp_rr);
 
 private:
   explicit AsyncLogger(QObject *parent = nullptr);

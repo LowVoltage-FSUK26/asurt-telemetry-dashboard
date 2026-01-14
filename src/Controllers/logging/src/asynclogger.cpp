@@ -123,26 +123,6 @@ void AsyncLogger::logSuspension(uint16_t sus_1, uint16_t sus_2, uint16_t sus_3,
   emit logEntryReady(entry);
 }
 
-void AsyncLogger::logTemperature(int16_t temp_fl, int16_t temp_fr,
-                                 int16_t temp_rl, int16_t temp_rr) {
-  if (!m_initialized) {
-    qWarning() << "AsyncLogger: Attempted to log Temperature data but logger "
-                  "not initialized";
-    return;
-  }
-
-  LogEntry entry;
-  entry.type = LogEntry::TEMPERATURE;
-  entry.timestamp = QDateTime::currentMSecsSinceEpoch();
-  entry.data = QString("%1,%2,%3,%4")
-                   .arg(temp_fl)
-                   .arg(temp_fr)
-                   .arg(temp_rl)
-                   .arg(temp_rr);
-
-  emit logEntryReady(entry);
-}
-
 // LoggerWorker implementation
 
 LoggerWorker::LoggerWorker(const QString &logDir)
@@ -212,22 +192,6 @@ bool LoggerWorker::openFiles() {
     writeHeader(m_suspensionStream, "timestamp,SUS_1,SUS_2,SUS_3,SUS_4");
   }
 
-  // Open Temperature log file
-  m_temperatureFile.setFileName(m_logDirectory + "/Temp.csv");
-  if (!m_temperatureFile.open(QIODevice::WriteOnly | QIODevice::Append |
-                              QIODevice::Text)) {
-    qWarning() << "Failed to open temperature log file:"
-               << m_temperatureFile.errorString();
-    return false;
-  }
-  m_temperatureStream.setDevice(&m_temperatureFile);
-
-  // Write header if file is empty
-  if (m_temperatureFile.size() == 0) {
-    writeHeader(m_temperatureStream,
-                "timestamp,Temp_FL,Temp_FR,Temp_RL,Temp_RR");
-  }
-
   return true;
 }
 
@@ -240,11 +204,6 @@ void LoggerWorker::closeFiles() {
   if (m_suspensionFile.isOpen()) {
     m_suspensionStream.flush();
     m_suspensionFile.close();
-  }
-
-  if (m_temperatureFile.isOpen()) {
-    m_temperatureStream.flush();
-    m_temperatureFile.close();
   }
 
   m_filesOpen = false;
@@ -278,9 +237,6 @@ void LoggerWorker::processEntry(const LogEntry &entry) {
     break;
   case LogEntry::SUSPENSION:
     stream = &m_suspensionStream;
-    break;
-  case LogEntry::TEMPERATURE:
-    stream = &m_temperatureStream;
     break;
   }
 

@@ -208,7 +208,6 @@ void UdpParserWorker::parseDatagram(const QByteArray &data)
             tempFR = static_cast<int>(temps.temp_fr);
             tempBL = static_cast<int>(temps.temp_rl);
             tempBR = static_cast<int>(temps.temp_rr);
-            AsyncLogger::instance().logTemperature(temps.temp_fl, temps.temp_fr, temps.temp_rl, temps.temp_rr);
             shouldEmit = true;
             break;
         }
