@@ -24,6 +24,10 @@ int MqttParserWorker::s_speedBL = 0;
 int MqttParserWorker::s_speedBR = 0;
 double MqttParserWorker::s_lateralG = 0.0;
 double MqttParserWorker::s_longitudinalG = 0.0;
+int MqttParserWorker::s_tempFL = 0;
+int MqttParserWorker::s_tempFR = 0;
+int MqttParserWorker::s_tempBL = 0;
+int MqttParserWorker::s_tempBR = 0;
 
 MqttParserWorker::MqttParserWorker(bool debugMode, QObject *parent)
     : QObject(parent), m_debugMode(debugMode), m_running(true),
@@ -56,6 +60,10 @@ void MqttParserWorker::resetSharedState() {
   s_speedBR = 0;
   s_lateralG = 0.0;
   s_longitudinalG = 0.0;
+  s_tempFL = 0;
+  s_tempFR = 0;
+  s_tempBL = 0;
+  s_tempBR = 0;
 }
 
 void MqttParserWorker::run() {
@@ -201,14 +209,13 @@ void MqttParserWorker::parseMessage(const QByteArray &message) {
     case CANDecoder::CAN_ID_TEMPERATURES: // 0x076
     {
       auto temps = CANDecoder::decodeTemperatures(payload);
+      s_tempFL = static_cast<int>(temps.temp_fl);
+      s_tempFR = static_cast<int>(temps.temp_fr);
+      s_tempBL = static_cast<int>(temps.temp_rl);
+      s_tempBR = static_cast<int>(temps.temp_rr);
       AsyncLogger::instance().logTemperature(temps.temp_fl, temps.temp_fr,
                                              temps.temp_rl, temps.temp_rr);
-      if (m_debugMode) {
-        qDebug() << "MqttParserWorker: Logged Temperature data - FL:"
-                 << temps.temp_fl << "FR:" << temps.temp_fr
-                 << "RL:" << temps.temp_rl << "RR:" << temps.temp_rr;
-      }
-      // Log only, no GUI update
+      shouldEmit = true;
       break;
     }
 
@@ -238,6 +245,10 @@ void MqttParserWorker::parseMessage(const QByteArray &message) {
       int speedBR = s_speedBR;
       double lateralG = s_lateralG;
       double longitudinalG = s_longitudinalG;
+      int tempFL = s_tempFL;
+      int tempFR = s_tempFR;
+      int tempBL = s_tempBL;
+      int tempBR = s_tempBR;
 
       // Unlock mutex before emitting to avoid blocking during signal emission
       locker.unlock();
@@ -245,7 +256,7 @@ void MqttParserWorker::parseMessage(const QByteArray &message) {
       emit messageParsed(speed, rpm, accPedal, brakePedal, encoderAngle,
                          temperature, batteryLevel, gpsLongitude, gpsLatitude,
                          speedFL, speedFR, speedBL, speedBR, lateralG,
-                         longitudinalG);
+                         longitudinalG, tempFL, tempFR, tempBL, tempBR);
 
       if (m_debugMode) {
         qDebug() << "MqttParserWorker: Decoded CAN ID 0x"

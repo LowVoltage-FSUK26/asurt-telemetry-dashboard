@@ -101,54 +101,107 @@ Rectangle {
                 fillMode : Image.PreserveAspectFit
                 smooth : true
             }
+            // Front Left - Temperature then Wheel Speed
+            TireTemperature {
+                id: tempFL
+                wheelPos: "T"
+                scaleFactor: root.scaleFactor
+                currentTemp: communicationManager ? communicationManager.tempFL : 0
+                anchors {
+                    top: car.top
+                    left: proximityRect.left
+                    topMargin: 70 * scaleFactor
+                    leftMargin: 5 * scaleFactor
+                }
+            }
             WheelSpeed {
                 id: fl
                 wheelPos: "FL"
-                scaleFactor : root.scaleFactor
+                scaleFactor: root.scaleFactor
                 currentSpeed: communicationManager ? communicationManager.speedFL : 0
                 anchors {
-                    top : car.top
-                    left : proximityRect.left
-                    topMargin : 70 * scaleFactor
-                    leftMargin : 20 * scaleFactor
+                    top: car.top
+                    left: tempFL.right
+                    topMargin: 70 * scaleFactor
+                    leftMargin: 5 * scaleFactor
                 }
             }
+            
+            // Front Right - Wheel Speed then Temperature
             WheelSpeed {
                 id: fr
                 wheelPos: "FR"
-                scaleFactor : root.scaleFactor
+                scaleFactor: root.scaleFactor
                 currentSpeed: communicationManager ? communicationManager.speedFR : 0
                 anchors {
-                    top : car.top
-                    right : proximityRect.right
-                    topMargin : 70 * scaleFactor
-                    rightMargin : 20 * scaleFactor
+                    top: car.top
+                    right: tempFR.left
+                    topMargin: 70 * scaleFactor
+                    rightMargin: 5 * scaleFactor
+                }
+            }
+            TireTemperature {
+                id: tempFR
+                wheelPos: "T"
+                scaleFactor: root.scaleFactor
+                currentTemp: communicationManager ? communicationManager.tempFR : 0
+                anchors {
+                    top: car.top
+                    right: proximityRect.right
+                    topMargin: 70 * scaleFactor
+                    rightMargin: 5 * scaleFactor
                 }
             }
 
+            // Back Left - Temperature then Wheel Speed
+            TireTemperature {
+                id: tempBL
+                wheelPos: "T"
+                scaleFactor: root.scaleFactor
+                currentTemp: communicationManager ? communicationManager.tempBL : 0
+                anchors {
+                    bottom: car.bottom
+                    left: proximityRect.left
+                    bottomMargin: 70 * scaleFactor
+                    leftMargin: 5 * scaleFactor
+                }
+            }
             WheelSpeed {
                 id: bl
                 wheelPos: "BL"
-                scaleFactor : root.scaleFactor
+                scaleFactor: root.scaleFactor
                 currentSpeed: communicationManager ? communicationManager.speedBL : 0
                 anchors {
-                    bottom : car.bottom
-                    left : proximityRect.left
-                    bottomMargin : 70 * scaleFactor
-                    leftMargin : 20 * scaleFactor
+                    bottom: car.bottom
+                    left: tempBL.right
+                    bottomMargin: 70 * scaleFactor
+                    leftMargin: 5 * scaleFactor
                 }
             }
 
+            // Back Right - Wheel Speed then Temperature
             WheelSpeed {
                 id: br
                 wheelPos: "BR"
-                scaleFactor : root.scaleFactor
+                scaleFactor: root.scaleFactor
                 currentSpeed: communicationManager ? communicationManager.speedBR : 0
                 anchors {
-                    bottom : car.bottom
-                    right : proximityRect.right
-                    bottomMargin : 70 * scaleFactor
-                    rightMargin : 20 * scaleFactor
+                    bottom: car.bottom
+                    right: tempBR.left
+                    bottomMargin: 70 * scaleFactor
+                    rightMargin: 5 * scaleFactor
+                }
+            }
+            TireTemperature {
+                id: tempBR
+                wheelPos: "T"
+                scaleFactor: root.scaleFactor
+                currentTemp: communicationManager ? communicationManager.tempBR : 0
+                anchors {
+                    bottom: car.bottom
+                    right: proximityRect.right
+                    bottomMargin: 70 * scaleFactor
+                    rightMargin: 5 * scaleFactor
                 }
             }
         }

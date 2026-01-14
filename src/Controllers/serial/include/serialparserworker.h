@@ -39,7 +39,8 @@ signals:
                     double encoderAngle, float temperature, int batteryLevel,
                     double gpsLongitude, double gpsLatitude,
                     int speedFL, int speedFR, int speedBL, int speedBR,
-                    double lateralG, double longitudinalG);
+                    double lateralG, double longitudinalG,
+                    int tempFL, int tempFR, int tempBL, int tempBR);
     void errorOccurred(const QString &error);
 
 private:
@@ -68,6 +69,10 @@ private:
     static int s_speedBR;
     static double s_lateralG;
     static double s_longitudinalG;
+    static int s_tempFL;
+    static int s_tempFR;
+    static int s_tempBL;
+    static int s_tempBR;
 };
 
 #endif // SERIALPARSERWORKER_H

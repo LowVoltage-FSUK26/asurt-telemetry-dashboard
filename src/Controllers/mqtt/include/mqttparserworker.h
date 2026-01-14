@@ -54,7 +54,8 @@ signals:
                      double encoderAngle, float temperature, int batteryLevel,
                      double gpsLongitude, double gpsLatitude, int speedFL,
                      int speedFR, int speedBL, int speedBR, double lateralG,
-                     double longitudinalG);
+                     double longitudinalG, int tempFL, int tempFR, int tempBL,
+                     int tempBR);
 
   /**
    * @brief Signal emitted when an error occurs during parsing
@@ -96,6 +97,10 @@ private:
   static int s_speedBR;
   static double s_lateralG;
   static double s_longitudinalG;
+  static int s_tempFL;
+  static int s_tempFR;
+  static int s_tempBL;
+  static int s_tempBR;
 };
 
 #endif // MQTTPARSERWORKER_H

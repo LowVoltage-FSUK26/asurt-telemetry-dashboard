@@ -25,6 +25,10 @@ CommunicationManager::CommunicationManager(QObject *parent)
     m_speedBR(0),
     m_lateralG(0.0),
     m_longitudinalG(0.0),
+    m_tempFL(0),
+    m_tempFR(0),
+    m_tempBL(0),
+    m_tempBR(0),
     m_isSerialSource(false)
 {
     // Connect signals from UdpClient to CommunicationManager's slots
@@ -43,6 +47,10 @@ CommunicationManager::CommunicationManager(QObject *parent)
     connect(m_udpClient, &UdpClient::speedBRChanged, this, &CommunicationManager::handleUdpSpeedBRChanged);
     connect(m_udpClient, &UdpClient::lateralGChanged, this, &CommunicationManager::handleUdpLateralGChanged);
     connect(m_udpClient, &UdpClient::longitudinalGChanged, this, &CommunicationManager::handleUdpLongitudinalGChanged);
+    connect(m_udpClient, &UdpClient::tempFLChanged, this, &CommunicationManager::handleUdpTempFLChanged);
+    connect(m_udpClient, &UdpClient::tempFRChanged, this, &CommunicationManager::handleUdpTempFRChanged);
+    connect(m_udpClient, &UdpClient::tempBLChanged, this, &CommunicationManager::handleUdpTempBLChanged);
+    connect(m_udpClient, &UdpClient::tempBRChanged, this, &CommunicationManager::handleUdpTempBRChanged);
     connect(m_udpClient, &UdpClient::errorOccurred, this, &CommunicationManager::handleUdpError);
 
     // Connect signals from SerialManager to CommunicationManager's slots
@@ -61,6 +69,10 @@ CommunicationManager::CommunicationManager(QObject *parent)
     connect(m_serialManager, &SerialManager::speedBRChanged, this, &CommunicationManager::handleSerialSpeedBRChanged);
     connect(m_serialManager, &SerialManager::lateralGChanged, this, &CommunicationManager::handleSerialLateralGChanged);
     connect(m_serialManager, &SerialManager::longitudinalGChanged, this, &CommunicationManager::handleSerialLongitudinalGChanged);
+    connect(m_serialManager, &SerialManager::tempFLChanged, this, &CommunicationManager::handleSerialTempFLChanged);
+    connect(m_serialManager, &SerialManager::tempFRChanged, this, &CommunicationManager::handleSerialTempFRChanged);
+    connect(m_serialManager, &SerialManager::tempBLChanged, this, &CommunicationManager::handleSerialTempBLChanged);
+    connect(m_serialManager, &SerialManager::tempBRChanged, this, &CommunicationManager::handleSerialTempBRChanged);
     connect(m_serialManager, &SerialManager::errorOccurred, this, &CommunicationManager::handleSerialError);
 
     connect(m_mqttClient, &MqttClient::speedChanged, this, &CommunicationManager::handleMqttSpeedChanged);
@@ -78,6 +90,10 @@ CommunicationManager::CommunicationManager(QObject *parent)
     connect(m_mqttClient, &MqttClient::speedBRChanged, this, &CommunicationManager::handleMqttSpeedBRChanged);
     connect(m_mqttClient, &MqttClient::lateralGChanged, this, &CommunicationManager::handleMqttLateralGChanged);
     connect(m_mqttClient, &MqttClient::longitudinalGChanged, this, &CommunicationManager::handleMqttLongitudinalGChanged);
+    connect(m_mqttClient, &MqttClient::tempFLChanged, this, &CommunicationManager::handleMqttTempFLChanged);
+    connect(m_mqttClient, &MqttClient::tempFRChanged, this, &CommunicationManager::handleMqttTempFRChanged);
+    connect(m_mqttClient, &MqttClient::tempBLChanged, this, &CommunicationManager::handleMqttTempBLChanged);
+    connect(m_mqttClient, &MqttClient::tempBRChanged, this, &CommunicationManager::handleMqttTempBRChanged);
     connect(m_mqttClient, &MqttClient::errorOccurred, this, &CommunicationManager::handleMqttError);
 }
 
@@ -363,6 +379,54 @@ void CommunicationManager::handleUdpLongitudinalGChanged(double newLongitudinalG
     }
 }
 
+void CommunicationManager::handleUdpTempFLChanged(int newTempFL)
+{
+    if (m_currentSource == SourceType::Udp)
+    {
+        if (m_tempFL != newTempFL)
+        {
+            m_tempFL = newTempFL;
+            emit tempFLChanged(m_tempFL);
+        }
+    }
+}
+
+void CommunicationManager::handleUdpTempFRChanged(int newTempFR)
+{
+    if (m_currentSource == SourceType::Udp)
+    {
+        if (m_tempFR != newTempFR)
+        {
+            m_tempFR = newTempFR;
+            emit tempFRChanged(m_tempFR);
+        }
+    }
+}
+
+void CommunicationManager::handleUdpTempBLChanged(int newTempBL)
+{
+    if (m_currentSource == SourceType::Udp)
+    {
+        if (m_tempBL != newTempBL)
+        {
+            m_tempBL = newTempBL;
+            emit tempBLChanged(m_tempBL);
+        }
+    }
+}
+
+void CommunicationManager::handleUdpTempBRChanged(int newTempBR)
+{
+    if (m_currentSource == SourceType::Udp)
+    {
+        if (m_tempBR != newTempBR)
+        {
+            m_tempBR = newTempBR;
+            emit tempBRChanged(m_tempBR);
+        }
+    }
+}
+
 void CommunicationManager::handleSerialSpeedChanged(float newSpeed)
 {
     if (m_currentSource == SourceType::Serial)
@@ -539,6 +603,54 @@ void CommunicationManager::handleSerialLongitudinalGChanged(double newLongitudin
         {
             m_longitudinalG = newLongitudinalG;
             emit longitudinalGChanged(m_longitudinalG);
+        }
+    }
+}
+
+void CommunicationManager::handleSerialTempFLChanged(int newTempFL)
+{
+    if (m_currentSource == SourceType::Serial)
+    {
+        if (m_tempFL != newTempFL)
+        {
+            m_tempFL = newTempFL;
+            emit tempFLChanged(m_tempFL);
+        }
+    }
+}
+
+void CommunicationManager::handleSerialTempFRChanged(int newTempFR)
+{
+    if (m_currentSource == SourceType::Serial)
+    {
+        if (m_tempFR != newTempFR)
+        {
+            m_tempFR = newTempFR;
+            emit tempFRChanged(m_tempFR);
+        }
+    }
+}
+
+void CommunicationManager::handleSerialTempBLChanged(int newTempBL)
+{
+    if (m_currentSource == SourceType::Serial)
+    {
+        if (m_tempBL != newTempBL)
+        {
+            m_tempBL = newTempBL;
+            emit tempBLChanged(m_tempBL);
+        }
+    }
+}
+
+void CommunicationManager::handleSerialTempBRChanged(int newTempBR)
+{
+    if (m_currentSource == SourceType::Serial)
+    {
+        if (m_tempBR != newTempBR)
+        {
+            m_tempBR = newTempBR;
+            emit tempBRChanged(m_tempBR);
         }
     }
 }
@@ -723,3 +835,50 @@ void CommunicationManager::handleMqttLongitudinalGChanged(double newLongitudinal
     }
 }
 
+void CommunicationManager::handleMqttTempFLChanged(int newTempFL)
+{
+    if (m_currentSource == SourceType::Mqtt)
+    {
+        if (m_tempFL != newTempFL)
+        {
+            m_tempFL = newTempFL;
+            emit tempFLChanged(m_tempFL);
+        }
+    }
+}
+
+void CommunicationManager::handleMqttTempFRChanged(int newTempFR)
+{
+    if (m_currentSource == SourceType::Mqtt)
+    {
+        if (m_tempFR != newTempFR)
+        {
+            m_tempFR = newTempFR;
+            emit tempFRChanged(m_tempFR);
+        }
+    }
+}
+
+void CommunicationManager::handleMqttTempBLChanged(int newTempBL)
+{
+    if (m_currentSource == SourceType::Mqtt)
+    {
+        if (m_tempBL != newTempBL)
+        {
+            m_tempBL = newTempBL;
+            emit tempBLChanged(m_tempBL);
+        }
+    }
+}
+
+void CommunicationManager::handleMqttTempBRChanged(int newTempBR)
+{
+    if (m_currentSource == SourceType::Mqtt)
+    {
+        if (m_tempBR != newTempBR)
+        {
+            m_tempBR = newTempBR;
+            emit tempBRChanged(m_tempBR);
+        }
+    }
+}

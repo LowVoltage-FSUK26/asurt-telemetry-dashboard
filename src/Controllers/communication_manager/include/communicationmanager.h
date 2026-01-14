@@ -31,6 +31,10 @@ class CommunicationManager : public QObject
     Q_PROPERTY(int speedBR READ speedBR NOTIFY speedBRChanged)
     Q_PROPERTY(double lateralG READ lateralG NOTIFY lateralGChanged)
     Q_PROPERTY(double longitudinalG READ longitudinalG NOTIFY longitudinalGChanged)
+    Q_PROPERTY(int tempFL READ tempFL NOTIFY tempFLChanged)
+    Q_PROPERTY(int tempFR READ tempFR NOTIFY tempFRChanged)
+    Q_PROPERTY(int tempBL READ tempBL NOTIFY tempBLChanged)
+    Q_PROPERTY(int tempBR READ tempBR NOTIFY tempBRChanged)
     Q_PROPERTY(bool isSerialSource READ isSerialSource WRITE setIsSerialSource NOTIFY isSerialSourceChanged)
 
 public:
@@ -53,6 +57,10 @@ public:
     int speedBR() const { return m_speedBR; }
     double lateralG() const { return m_lateralG; }
     double longitudinalG() const { return m_longitudinalG; }
+    int tempFL() const { return m_tempFL; }
+    int tempFR() const { return m_tempFR; }
+    int tempBL() const { return m_tempBL; }
+    int tempBR() const { return m_tempBR; }
 
     Q_INVOKABLE bool startSerial(const QString &portName, qint32 baudRate);
     Q_INVOKABLE bool startUdp(quint16 port);
@@ -78,6 +86,10 @@ signals:
     void speedBRChanged(int newSpeedBR);
     void lateralGChanged(double newLateralG);
     void longitudinalGChanged(double newLongitudinalG);
+    void tempFLChanged(int newTempFL);
+    void tempFRChanged(int newTempFR);
+    void tempBLChanged(int newTempBL);
+    void tempBRChanged(int newTempBR);
     void isSerialSourceChanged(bool isSerialSource);
     void errorOccurred(const QString &error);
 
@@ -97,6 +109,10 @@ private slots:
     void handleUdpSpeedBRChanged(int newSpeedBR);
     void handleUdpLateralGChanged(double newLateralG);
     void handleUdpLongitudinalGChanged(double newLongitudinalG);
+    void handleUdpTempFLChanged(int newTempFL);
+    void handleUdpTempFRChanged(int newTempFR);
+    void handleUdpTempBLChanged(int newTempBL);
+    void handleUdpTempBRChanged(int newTempBR);
     void handleUdpError(const QString &error);
 
     void handleSerialSpeedChanged(float newSpeed);
@@ -114,6 +130,10 @@ private slots:
     void handleSerialSpeedBRChanged(int newSpeedBR);
     void handleSerialLateralGChanged(double newLateralG);
     void handleSerialLongitudinalGChanged(double newLongitudinalG);
+    void handleSerialTempFLChanged(int newTempFL);
+    void handleSerialTempFRChanged(int newTempFR);
+    void handleSerialTempBLChanged(int newTempBL);
+    void handleSerialTempBRChanged(int newTempBR);
     void handleSerialError(const QString &error);
 
 
@@ -132,6 +152,10 @@ private slots:
     void handleMqttSpeedBRChanged(int newSpeedBR);
     void handleMqttLateralGChanged(double newLateralG);
     void handleMqttLongitudinalGChanged(double newLongitudinalG);
+    void handleMqttTempFLChanged(int newTempFL);
+    void handleMqttTempFRChanged(int newTempFR);
+    void handleMqttTempBLChanged(int newTempBL);
+    void handleMqttTempBRChanged(int newTempBR);
     void handleMqttError(const QString &error);
 
 private:
@@ -161,6 +185,10 @@ private:
     int m_speedBR;
     double m_lateralG;
     double m_longitudinalG;
+    int m_tempFL;
+    int m_tempFR;
+    int m_tempBL;
+    int m_tempBR;
     bool m_isSerialSource;
 
 };

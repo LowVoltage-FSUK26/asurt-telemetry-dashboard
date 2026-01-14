@@ -13,7 +13,7 @@ MqttClient::MqttClient(QObject *parent)
       m_accPedal(0), m_brakePedal(0), m_encoderAngle(0.0), m_temperature(0.0f),
       m_batteryLevel(0), m_gpsLongitude(0.0), m_gpsLatitude(0.0), m_speedFL(0),
       m_speedFR(0), m_speedBL(0), m_speedBR(0), m_lateralG(0.0),
-      m_longitudinalG(0.0) {
+      m_longitudinalG(0.0), m_tempFL(0), m_tempFR(0), m_tempBL(0), m_tempBR(0) {
   // Initialize async logger
   AsyncLogger::instance().initialize("./logs");
 
@@ -119,7 +119,8 @@ void MqttClient::handleParsedData(float speed, int rpm, int accPedal,
                                   double gpsLongitude, double gpsLatitude,
                                   int speedFL, int speedFR, int speedBL,
                                   int speedBR, double lateralG,
-                                  double longitudinalG) {
+                                  double longitudinalG, int tempFL, int tempFR,
+                                  int tempBL, int tempBR) {
   m_messagesProcessed.fetch_add(1);
 
   float oldSpeed = m_speed.load(std::memory_order_relaxed);
@@ -210,6 +211,30 @@ void MqttClient::handleParsedData(float speed, int rpm, int accPedal,
   if (!qFuzzyCompare(oldLongitudinalG, longitudinalG)) {
     m_longitudinalG.store(longitudinalG, std::memory_order_relaxed);
     emit longitudinalGChanged(longitudinalG);
+  }
+
+  int oldTempFL = m_tempFL.load(std::memory_order_relaxed);
+  if (oldTempFL != tempFL) {
+    m_tempFL.store(tempFL, std::memory_order_relaxed);
+    emit tempFLChanged(tempFL);
+  }
+
+  int oldTempFR = m_tempFR.load(std::memory_order_relaxed);
+  if (oldTempFR != tempFR) {
+    m_tempFR.store(tempFR, std::memory_order_relaxed);
+    emit tempFRChanged(tempFR);
+  }
+
+  int oldTempBL = m_tempBL.load(std::memory_order_relaxed);
+  if (oldTempBL != tempBL) {
+    m_tempBL.store(tempBL, std::memory_order_relaxed);
+    emit tempBLChanged(tempBL);
+  }
+
+  int oldTempBR = m_tempBR.load(std::memory_order_relaxed);
+  if (oldTempBR != tempBR) {
+    m_tempBR.store(tempBR, std::memory_order_relaxed);
+    emit tempBRChanged(tempBR);
   }
 }
 

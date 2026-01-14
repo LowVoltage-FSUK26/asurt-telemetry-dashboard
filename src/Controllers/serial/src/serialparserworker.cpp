@@ -23,6 +23,10 @@ int SerialParserWorker::s_speedBL = 0;
 int SerialParserWorker::s_speedBR = 0;
 double SerialParserWorker::s_lateralG = 0.0;
 double SerialParserWorker::s_longitudinalG = 0.0;
+int SerialParserWorker::s_tempFL = 0;
+int SerialParserWorker::s_tempFR = 0;
+int SerialParserWorker::s_tempBL = 0;
+int SerialParserWorker::s_tempBR = 0;
 
 SerialParserWorker::SerialParserWorker(bool debugMode, QObject *parent)
     : QObject(parent), m_running(true), m_debugMode(debugMode) {
@@ -48,6 +52,10 @@ void SerialParserWorker::resetSharedState() {
   s_speedBR = 0;
   s_lateralG = 0.0;
   s_longitudinalG = 0.0;
+  s_tempFL = 0;
+  s_tempFR = 0;
+  s_tempBL = 0;
+  s_tempBR = 0;
 }
 
 void SerialParserWorker::queueData(const QByteArray &data) {
@@ -181,14 +189,13 @@ void SerialParserWorker::parseData(const QByteArray &data) {
     case CANDecoder::CAN_ID_TEMPERATURES: // 0x076
     {
       auto temps = CANDecoder::decodeTemperatures(payload);
+      s_tempFL = static_cast<int>(temps.temp_fl);
+      s_tempFR = static_cast<int>(temps.temp_fr);
+      s_tempBL = static_cast<int>(temps.temp_rl);
+      s_tempBR = static_cast<int>(temps.temp_rr);
       AsyncLogger::instance().logTemperature(temps.temp_fl, temps.temp_fr,
                                              temps.temp_rl, temps.temp_rr);
-      if (m_debugMode) {
-        qDebug() << "SerialParserWorker: Logged Temperature data - FL:"
-                 << temps.temp_fl << "FR:" << temps.temp_fr
-                 << "RL:" << temps.temp_rl << "RR:" << temps.temp_rr;
-      }
-      // Log only, no GUI update
+      shouldEmit = true;
       break;
     }
 
@@ -220,6 +227,10 @@ void SerialParserWorker::parseData(const QByteArray &data) {
       int speedBR = s_speedBR;
       double lateralG = s_lateralG;
       double longitudinalG = s_longitudinalG;
+      int tempFL = s_tempFL;
+      int tempFR = s_tempFR;
+      int tempBL = s_tempBL;
+      int tempBR = s_tempBR;
 
       // Unlock mutex before emitting to avoid blocking during signal emission
       locker.unlock();
@@ -227,7 +238,7 @@ void SerialParserWorker::parseData(const QByteArray &data) {
       emit dataParsed(speed, rpm, accPedal, brakePedal, encoderAngle,
                       temperature, batteryLevel, gpsLongitude, gpsLatitude,
                       speedFL, speedFR, speedBL, speedBR, lateralG,
-                      longitudinalG);
+                      longitudinalG, tempFL, tempFR, tempBL, tempBR);
 
       if (m_debugMode) {
         qDebug() << "SerialParserWorker: Decoded CAN ID 0x"

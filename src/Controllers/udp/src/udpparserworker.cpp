@@ -142,6 +142,10 @@ void UdpParserWorker::parseDatagram(const QByteArray &data)
         int speedBR = 0;
         double lateralG = 0.0;
         double longitudinalG = 0.0;
+        int tempFL = 0;
+        int tempFR = 0;
+        int tempBL = 0;
+        int tempBR = 0;
         
         bool shouldEmit = false;
         
@@ -200,8 +204,12 @@ void UdpParserWorker::parseDatagram(const QByteArray &data)
         case CANDecoder::CAN_ID_TEMPERATURES: // 0x076
         {
             auto temps = CANDecoder::decodeTemperatures(payload);
+            tempFL = static_cast<int>(temps.temp_fl);
+            tempFR = static_cast<int>(temps.temp_fr);
+            tempBL = static_cast<int>(temps.temp_rl);
+            tempBR = static_cast<int>(temps.temp_rr);
             AsyncLogger::instance().logTemperature(temps.temp_fl, temps.temp_fr, temps.temp_rl, temps.temp_rr);
-            // Log only, no GUI update
+            shouldEmit = true;
             break;
         }
         
@@ -221,7 +229,8 @@ void UdpParserWorker::parseDatagram(const QByteArray &data)
                 encoderAngle, temperature, batteryLevel,
                 gpsLongitude, gpsLatitude,
                 speedFL, speedFR, speedBL, speedBR,
-                lateralG, longitudinalG);
+                lateralG, longitudinalG,
+                tempFL, tempFR, tempBL, tempBR);
             
             // Log debug info occasionally
             if (m_debugMode && m_datagramsParsed % 1000 == 0)

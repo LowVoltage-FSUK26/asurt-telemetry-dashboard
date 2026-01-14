@@ -49,7 +49,8 @@ signals:
                         double encoderAngle, float temperature, int batteryLevel,
                         double gpsLongitude, double gpsLatitude,
                         int speedFL, int speedFR, int speedBL, int speedBR,
-                        double lateralG, double longitudinalG);
+                        double lateralG, double longitudinalG,
+                        int tempFL, int tempFR, int tempBL, int tempBR);
 
     /**
      * @brief Signal emitted when an error occurs during parsing

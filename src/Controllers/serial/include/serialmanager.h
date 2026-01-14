@@ -33,6 +33,10 @@ class SerialManager : public QObject
     Q_PROPERTY(int speedBR READ speedBR NOTIFY speedBRChanged)
     Q_PROPERTY(double lateralG READ lateralG NOTIFY lateralGChanged)
     Q_PROPERTY(double longitudinalG READ longitudinalG NOTIFY longitudinalGChanged)
+    Q_PROPERTY(int tempFL READ tempFL NOTIFY tempFLChanged)
+    Q_PROPERTY(int tempFR READ tempFR NOTIFY tempFRChanged)
+    Q_PROPERTY(int tempBL READ tempBL NOTIFY tempBLChanged)
+    Q_PROPERTY(int tempBR READ tempBR NOTIFY tempBRChanged)
 
 public:
     explicit SerialManager(QObject *parent = nullptr);
@@ -59,6 +63,10 @@ public:
     int speedBR() const { return m_speedBR.load(); }
     double lateralG() const { return m_lateralG.load(); }
     double longitudinalG() const { return m_longitudinalG.load(); }
+    int tempFL() const { return m_tempFL.load(); }
+    int tempFR() const { return m_tempFR.load(); }
+    int tempBL() const { return m_tempBL.load(); }
+    int tempBR() const { return m_tempBR.load(); }
 
 signals:
     // Property change signals
@@ -77,6 +85,10 @@ signals:
     void speedBRChanged(int newSpeedBR);
     void lateralGChanged(double newLateralG);
     void longitudinalGChanged(double newLongitudinalG);
+    void tempFLChanged(int newTempFL);
+    void tempFRChanged(int newTempFR);
+    void tempBLChanged(int newTempBL);
+    void tempBRChanged(int newTempBR);
 
     // Error signal
     void errorOccurred(const QString &error);
@@ -90,7 +102,8 @@ private slots:
                           double encoderAngle, float temperature, int batteryLevel,
                           double gpsLongitude, double gpsLatitude,
                           int speedFL, int speedFR, int speedBL, int speedBR,
-                          double lateralG, double longitudinalG);
+                          double lateralG, double longitudinalG,
+                          int tempFL, int tempFR, int tempBL, int tempBR);
 
     void handleError(const QString &error);
     void handleSerialDataReceived(const QByteArray &data);
@@ -125,6 +138,10 @@ private:
     std::atomic<int> m_speedBR;
     std::atomic<double> m_lateralG;
     std::atomic<double> m_longitudinalG;
+    std::atomic<int> m_tempFL;
+    std::atomic<int> m_tempFR;
+    std::atomic<int> m_tempBL;
+    std::atomic<int> m_tempBR;
 
     void initializeParsers();
     void cleanupParsers();
