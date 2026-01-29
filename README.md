@@ -83,14 +83,13 @@ The dashboard supports multiple communication protocols (Serial, UDP, and MQTT),
 
 ## 📸 Screenshots
 
-> **Note**: Add screenshots of your dashboard here to showcase the interface.
+### Session Setup
 
-<!-- 
-Example format:
-![Dashboard Overview](docs/screenshots/dashboard-overview.png)
-![GPS Tracking](docs/screenshots/gps-tracking.png)
-![G-Force Visualization](docs/screenshots/g-force-plot.png)
--->
+<img width="900" alt="Session Setup" src="https://github.com/user-attachments/assets/bb477943-48df-4a66-ae03-63c54abb7488" />
+
+### Dashboard Overview
+
+<img width="900" alt="Dashboard Overview" src="https://github.com/user-attachments/assets/92189e08-f3ba-4dd9-8892-9164fabb31f8" />
 
 ---
 
