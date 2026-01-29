@@ -5,6 +5,7 @@
 #include <QThread>
 #include <QThreadPool>
 #include <QAtomicInt>
+#include <QTimer>
 #include <atomic>
 #include <QtMqtt/QMqttClient>
 
@@ -138,6 +139,12 @@ private slots:
 
     void handleMqttMessageReceived(const QByteArray &message); // Receives raw messages from the receiver worker and dispatches them to parser workers.
 
+    /**
+     * @brief Flush pending updates to QML at 60Hz rate
+     * This batches all property updates to prevent flooding the event loop
+     */
+    void flushPendingUpdates();
+
 private:
     // Worker threads
     QThread m_receiverThread;             // Dedicated thread for the receiver worker
@@ -150,6 +157,10 @@ private:
     // Configuration
     int m_parserThreadCount;
     bool m_debugMode;
+
+    // Update throttling (60Hz)
+    QTimer *m_updateTimer;
+    std::atomic<bool> m_pendingUpdate;
 
     // Performance tracking
     std::atomic<qint64> m_messagesProcessed;

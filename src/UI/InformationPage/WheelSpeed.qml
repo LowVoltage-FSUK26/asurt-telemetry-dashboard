@@ -30,10 +30,10 @@ Rectangle {
     }
     Text {
         id: pos
-        text: root.wheelPos + ": "
+        text: root.wheelPos + ":"
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: speedText.top
-        font.pixelSize: Math.max(10, 14 * root.scaleFactor)
+        font.pixelSize: Math.max(8, 12 * root.scaleFactor)  // Reduced for visual balance
         color: "turquoise"
     }
 
@@ -42,7 +42,7 @@ Rectangle {
         text: parent.currentSpeed + " km/h"
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.top
-        font.pixelSize: Math.max(11, 16 * root.scaleFactor)
+        font.pixelSize: Math.max(9, 13 * root.scaleFactor)  // Reduced for visual balance
         font.family: "DS-Digital"
         color: root.getColorForSpeed(root.currentSpeed)
     }

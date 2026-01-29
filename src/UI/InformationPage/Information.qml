@@ -39,7 +39,7 @@ Rectangle {
 
     Rectangle {
         id : leftRect
-        width : parent.width / 4
+        width : parent.width / 3.8  // Slightly wider for better spacing
         color : "#09122C"
         radius : Math.max(20, 30 * scaleFactor)
         border.width : 2
@@ -49,14 +49,14 @@ Rectangle {
             top : statusBar.bottom
             left: parent.left
             bottom : parent.bottom
-            leftMargin : 12 * scaleFactor
+            leftMargin : 10 * scaleFactor
             topMargin : 5 * scaleFactor
-            bottomMargin : 12 * scaleFactor
+            bottomMargin : 10 * scaleFactor
         }
 
         Rectangle {
             id: steeringWheelRect
-            width: parent.width - 40 * scaleFactor
+            width: parent.width - 20 * scaleFactor  // More internal space
             height: parent.height / 3
             color: "#636363"
             border.color: "turquoise"
@@ -65,7 +65,7 @@ Rectangle {
             anchors {
                 horizontalCenter : parent.horizontalCenter
                 top : parent.top
-                topMargin : 10 * scaleFactor
+                topMargin : 8 * scaleFactor
 
             }
             SteeringWheel {
@@ -79,7 +79,7 @@ Rectangle {
 
         Rectangle {
             id : proximityRect
-            width : parent.width - 30 * scaleFactor
+            width : parent.width - 16 * scaleFactor  // More internal space
             color : "#636363"
             border.color: "turquoise"
             border.width: 2
@@ -89,8 +89,8 @@ Rectangle {
                 horizontalCenter : parent.horizontalCenter
                 top : steeringWheelRect.bottom
                 bottom : parent.bottom
-                topMargin : 10 * scaleFactor
-                bottomMargin : 10 * scaleFactor
+                topMargin : 8 * scaleFactor
+                bottomMargin : 8 * scaleFactor
             }
 
             Image {
@@ -110,8 +110,8 @@ Rectangle {
                 anchors {
                     top: car.top
                     left: proximityRect.left
-                    topMargin: 70 * scaleFactor
-                    leftMargin: 5 * scaleFactor
+                    topMargin: 60 * scaleFactor
+                    leftMargin: 8 * scaleFactor
                 }
             }
             WheelSpeed {
@@ -122,8 +122,8 @@ Rectangle {
                 anchors {
                     top: car.top
                     left: tempFL.right
-                    topMargin: 70 * scaleFactor
-                    leftMargin: 5 * scaleFactor
+                    topMargin: 60 * scaleFactor
+                    leftMargin: 6 * scaleFactor  // Increased spacing
                 }
             }
             
@@ -136,8 +136,8 @@ Rectangle {
                 anchors {
                     top: car.top
                     right: tempFR.left
-                    topMargin: 70 * scaleFactor
-                    rightMargin: 5 * scaleFactor
+                    topMargin: 60 * scaleFactor
+                    rightMargin: 6 * scaleFactor  // Increased spacing
                 }
             }
             TireTemperature {
@@ -148,8 +148,8 @@ Rectangle {
                 anchors {
                     top: car.top
                     right: proximityRect.right
-                    topMargin: 70 * scaleFactor
-                    rightMargin: 5 * scaleFactor
+                    topMargin: 60 * scaleFactor
+                    rightMargin: 8 * scaleFactor
                 }
             }
 
@@ -162,8 +162,8 @@ Rectangle {
                 anchors {
                     bottom: car.bottom
                     left: proximityRect.left
-                    bottomMargin: 70 * scaleFactor
-                    leftMargin: 5 * scaleFactor
+                    bottomMargin: 60 * scaleFactor
+                    leftMargin: 8 * scaleFactor
                 }
             }
             WheelSpeed {
@@ -174,8 +174,8 @@ Rectangle {
                 anchors {
                     bottom: car.bottom
                     left: tempBL.right
-                    bottomMargin: 70 * scaleFactor
-                    leftMargin: 5 * scaleFactor
+                    bottomMargin: 60 * scaleFactor
+                    leftMargin: 6 * scaleFactor  // Increased spacing
                 }
             }
 
@@ -188,8 +188,8 @@ Rectangle {
                 anchors {
                     bottom: car.bottom
                     right: tempBR.left
-                    bottomMargin: 70 * scaleFactor
-                    rightMargin: 5 * scaleFactor
+                    bottomMargin: 60 * scaleFactor
+                    rightMargin: 6 * scaleFactor  // Increased spacing
                 }
             }
             TireTemperature {
@@ -200,8 +200,8 @@ Rectangle {
                 anchors {
                     bottom: car.bottom
                     right: proximityRect.right
-                    bottomMargin: 70 * scaleFactor
-                    rightMargin: 5 * scaleFactor
+                    bottomMargin: 60 * scaleFactor
+                    rightMargin: 8 * scaleFactor
                 }
             }
         }
@@ -216,9 +216,9 @@ Rectangle {
 
     Rectangle {
         id: metersScreen
-        // Proportional width and height based on design size (675x335 at scale 1.0)
-        width: Math.max(500, 675 * scaleFactor)
-        height: Math.max(280, 335 * scaleFactor)
+        // Proportional width and height based on design size
+        width: Math.max(480, 640 * scaleFactor)  // Slightly narrower
+        height: Math.max(270, 320 * scaleFactor)
         color: "#09122C"
         border.color: "#D84040"
         border.width: 2
@@ -226,8 +226,9 @@ Rectangle {
         anchors {
             top : statusBar.bottom
             topMargin: 8 * scaleFactor
-            // Center horizontally between leftRect and rightRect
-            horizontalCenter: parent.horizontalCenter
+            // Position between leftRect and rightRect with proper margins
+            left: leftRect.right
+            leftMargin: 15 * scaleFactor
         }
 
         radius: Math.max(12, 20 * scaleFactor)
@@ -527,7 +528,7 @@ Rectangle {
 
     Rectangle {
         id : rightRect
-        width : parent.width / 4
+        width : parent.width / 4.2  // Symmetrical with leftRect
         color : "#09122C"
         radius : Math.max(20, 30 * scaleFactor)
         border.width : 2
@@ -537,9 +538,9 @@ Rectangle {
             top : statusBar.bottom
             right: parent.right
             bottom : parent.bottom
-            rightMargin : 12 * scaleFactor
+            rightMargin : 10 * scaleFactor
             topMargin : 5 * scaleFactor
-            bottomMargin : 12 * scaleFactor
+            bottomMargin : 10 * scaleFactor
         }
 
         Text {

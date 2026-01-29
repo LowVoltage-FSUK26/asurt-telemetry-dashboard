@@ -8,7 +8,8 @@
 
 SerialManager::SerialManager(QObject *parent)
     : QObject(parent), m_nextParserIndex(0),
-      m_parserThreadCount(QThread::idealThreadCount()), m_debugMode(true),
+      m_parserThreadCount(QThread::idealThreadCount()), m_debugMode(false),
+      m_pendingUpdate(false),
       m_datagramsProcessed(0), m_datagramsDropped(0), m_speed(0.0f), m_rpm(0),
       m_accPedal(0), m_brakePedal(0), m_encoderAngle(0.0), m_temperature(0.0f),
       m_batteryLevel(0), m_gpsLongitude(0.0), m_gpsLatitude(0.0), m_speedFL(0),
@@ -16,6 +17,12 @@ SerialManager::SerialManager(QObject *parent)
       m_longitudinalG(0.0), m_tempFL(0), m_tempFR(0), m_tempBL(0), m_tempBR(0) {
   // Initialize async logger
   AsyncLogger::instance().initialize("./logs");
+
+  // Initialize update throttling timer (60Hz = 16ms interval)
+  m_updateTimer = new QTimer(this);
+  m_updateTimer->setInterval(16);
+  connect(m_updateTimer, &QTimer::timeout, this, &SerialManager::flushPendingUpdates);
+  m_updateTimer->start();
 
   // Create and configure the receiver worker
   m_receiverWorker = new SerialReceiverWorker();
@@ -42,6 +49,11 @@ SerialManager::SerialManager(QObject *parent)
 }
 
 SerialManager::~SerialManager() {
+  // Stop the update timer first
+  if (m_updateTimer) {
+    m_updateTimer->stop();
+  }
+
   stop();
 
   // Wait for receiver thread to finish
@@ -143,138 +155,59 @@ void SerialManager::handleParsedData(float speed, int rpm, int accPedal,
   // Increment processed count
   m_datagramsProcessed.fetch_add(1);
 
-  // Update speed if changed
-  float oldSpeed = m_speed.load(std::memory_order_relaxed);
-  if (!qFuzzyCompare(oldSpeed, speed)) {
-    m_speed.store(speed, std::memory_order_relaxed);
-    emit speedChanged(speed);
+  // Store all values atomically without emitting signals
+  // Signals will be emitted by flushPendingUpdates() at 60Hz
+  m_speed.store(speed, std::memory_order_relaxed);
+  m_rpm.store(rpm, std::memory_order_relaxed);
+  m_accPedal.store(accPedal, std::memory_order_relaxed);
+  m_brakePedal.store(brakePedal, std::memory_order_relaxed);
+  m_encoderAngle.store(encoderAngle, std::memory_order_relaxed);
+  m_temperature.store(temperature, std::memory_order_relaxed);
+  m_batteryLevel.store(batteryLevel, std::memory_order_relaxed);
+  m_gpsLongitude.store(gpsLongitude, std::memory_order_relaxed);
+  m_gpsLatitude.store(gpsLatitude, std::memory_order_relaxed);
+  m_speedFL.store(speedFL, std::memory_order_relaxed);
+  m_speedFR.store(speedFR, std::memory_order_relaxed);
+  m_speedBL.store(speedBL, std::memory_order_relaxed);
+  m_speedBR.store(speedBR, std::memory_order_relaxed);
+  m_lateralG.store(lateralG, std::memory_order_relaxed);
+  m_longitudinalG.store(longitudinalG, std::memory_order_relaxed);
+  m_tempFL.store(tempFL, std::memory_order_relaxed);
+  m_tempFR.store(tempFR, std::memory_order_relaxed);
+  m_tempBL.store(tempBL, std::memory_order_relaxed);
+  m_tempBR.store(tempBR, std::memory_order_relaxed);
+
+  // Mark that we have pending updates
+  m_pendingUpdate.store(true, std::memory_order_release);
+}
+
+void SerialManager::flushPendingUpdates() {
+  // Check if we have any pending updates
+  if (!m_pendingUpdate.exchange(false, std::memory_order_acquire)) {
+    return; // No updates pending
   }
 
-  // Update rpm if changed
-  int oldRpm = m_rpm.load(std::memory_order_relaxed);
-  if (oldRpm != rpm) {
-    m_rpm.store(rpm, std::memory_order_relaxed);
-    emit rpmChanged(rpm);
-  }
-
-  // Update accPedal if changed
-  int oldAccPedal = m_accPedal.load(std::memory_order_relaxed);
-  if (oldAccPedal != accPedal) {
-    m_accPedal.store(accPedal, std::memory_order_relaxed);
-    emit accPedalChanged(accPedal);
-  }
-
-  // Update brakePedal if changed
-  int oldBrakePedal = m_brakePedal.load(std::memory_order_relaxed);
-  if (oldBrakePedal != brakePedal) {
-    m_brakePedal.store(brakePedal, std::memory_order_relaxed);
-    emit brakePedalChanged(brakePedal);
-  }
-
-  // Update encoderAngle if changed
-  double oldEncoderAngle = m_encoderAngle.load(std::memory_order_relaxed);
-  if (!qFuzzyCompare(oldEncoderAngle, encoderAngle)) {
-    m_encoderAngle.store(encoderAngle, std::memory_order_relaxed);
-    emit encoderAngleChanged(encoderAngle);
-  }
-
-  // Update temperature if changed
-  float oldTemperature = m_temperature.load(std::memory_order_relaxed);
-  if (!qFuzzyCompare(oldTemperature, temperature)) {
-    m_temperature.store(temperature, std::memory_order_relaxed);
-    emit temperatureChanged(temperature);
-  }
-
-  // Update batteryLevel if changed
-  int oldBatteryLevel = m_batteryLevel.load(std::memory_order_relaxed);
-  if (oldBatteryLevel != batteryLevel) {
-    m_batteryLevel.store(batteryLevel, std::memory_order_relaxed);
-    emit batteryLevelChanged(batteryLevel);
-  }
-
-  // Update gpsLongitude if changed
-  double oldGpsLongitude = m_gpsLongitude.load(std::memory_order_relaxed);
-  if (!qFuzzyCompare(oldGpsLongitude, gpsLongitude)) {
-    m_gpsLongitude.store(gpsLongitude, std::memory_order_relaxed);
-    emit gpsLongitudeChanged(gpsLongitude);
-  }
-
-  // Update gpsLatitude if changed
-  double oldGpsLatitude = m_gpsLatitude.load(std::memory_order_relaxed);
-  if (!qFuzzyCompare(oldGpsLatitude, gpsLatitude)) {
-    m_gpsLatitude.store(gpsLatitude, std::memory_order_relaxed);
-    emit gpsLatitudeChanged(gpsLatitude);
-  }
-
-  // Update speedFL if changed
-  int oldSpeedFL = m_speedFL.load(std::memory_order_relaxed);
-  if (oldSpeedFL != speedFL) {
-    m_speedFL.store(speedFL, std::memory_order_relaxed);
-    emit speedFLChanged(speedFL);
-  }
-
-  // Update speedFR if changed
-  int oldSpeedFR = m_speedFR.load(std::memory_order_relaxed);
-  if (oldSpeedFR != speedFR) {
-    m_speedFR.store(speedFR, std::memory_order_relaxed);
-    emit speedFRChanged(speedFR);
-  }
-
-  // Update speedBL if changed
-  int oldSpeedBL = m_speedBL.load(std::memory_order_relaxed);
-  if (oldSpeedBL != speedBL) {
-    m_speedBL.store(speedBL, std::memory_order_relaxed);
-    emit speedBLChanged(speedBL);
-  }
-
-  // Update speedBR if changed
-  int oldSpeedBR = m_speedBR.load(std::memory_order_relaxed);
-  if (oldSpeedBR != speedBR) {
-    m_speedBR.store(speedBR, std::memory_order_relaxed);
-    emit speedBRChanged(speedBR);
-  }
-
-  // Update lateralG if changed
-  double oldLateralG = m_lateralG.load(std::memory_order_relaxed);
-  if (!qFuzzyCompare(oldLateralG, lateralG)) {
-    m_lateralG.store(lateralG, std::memory_order_relaxed);
-    emit lateralGChanged(lateralG);
-  }
-
-  // Update longitudinalG if changed
-  double oldLongitudinalG = m_longitudinalG.load(std::memory_order_relaxed);
-  if (!qFuzzyCompare(oldLongitudinalG, longitudinalG)) {
-    m_longitudinalG.store(longitudinalG, std::memory_order_relaxed);
-    emit longitudinalGChanged(longitudinalG);
-  }
-
-  // Update tempFL if changed
-  int oldTempFL = m_tempFL.load(std::memory_order_relaxed);
-  if (oldTempFL != tempFL) {
-    m_tempFL.store(tempFL, std::memory_order_relaxed);
-    emit tempFLChanged(tempFL);
-  }
-
-  // Update tempFR if changed
-  int oldTempFR = m_tempFR.load(std::memory_order_relaxed);
-  if (oldTempFR != tempFR) {
-    m_tempFR.store(tempFR, std::memory_order_relaxed);
-    emit tempFRChanged(tempFR);
-  }
-
-  // Update tempBL if changed
-  int oldTempBL = m_tempBL.load(std::memory_order_relaxed);
-  if (oldTempBL != tempBL) {
-    m_tempBL.store(tempBL, std::memory_order_relaxed);
-    emit tempBLChanged(tempBL);
-  }
-
-  // Update tempBR if changed
-  int oldTempBR = m_tempBR.load(std::memory_order_relaxed);
-  if (oldTempBR != tempBR) {
-    m_tempBR.store(tempBR, std::memory_order_relaxed);
-    emit tempBRChanged(tempBR);
-  }
+  // Read all current values and emit signals
+  // This batches all updates to a maximum of 60Hz
+  emit speedChanged(m_speed.load(std::memory_order_relaxed));
+  emit rpmChanged(m_rpm.load(std::memory_order_relaxed));
+  emit accPedalChanged(m_accPedal.load(std::memory_order_relaxed));
+  emit brakePedalChanged(m_brakePedal.load(std::memory_order_relaxed));
+  emit encoderAngleChanged(m_encoderAngle.load(std::memory_order_relaxed));
+  emit temperatureChanged(m_temperature.load(std::memory_order_relaxed));
+  emit batteryLevelChanged(m_batteryLevel.load(std::memory_order_relaxed));
+  emit gpsLongitudeChanged(m_gpsLongitude.load(std::memory_order_relaxed));
+  emit gpsLatitudeChanged(m_gpsLatitude.load(std::memory_order_relaxed));
+  emit speedFLChanged(m_speedFL.load(std::memory_order_relaxed));
+  emit speedFRChanged(m_speedFR.load(std::memory_order_relaxed));
+  emit speedBLChanged(m_speedBL.load(std::memory_order_relaxed));
+  emit speedBRChanged(m_speedBR.load(std::memory_order_relaxed));
+  emit lateralGChanged(m_lateralG.load(std::memory_order_relaxed));
+  emit longitudinalGChanged(m_longitudinalG.load(std::memory_order_relaxed));
+  emit tempFLChanged(m_tempFL.load(std::memory_order_relaxed));
+  emit tempFRChanged(m_tempFR.load(std::memory_order_relaxed));
+  emit tempBLChanged(m_tempBL.load(std::memory_order_relaxed));
+  emit tempBRChanged(m_tempBR.load(std::memory_order_relaxed));
 }
 
 void SerialManager::handleError(const QString &error) {
@@ -322,10 +255,6 @@ void SerialManager::cleanupParsers() {
     qWarning() << "Serial parser pool did not finish in time";
   }
 
-  // Note: parsers are auto-deleted by thread pool after run() completes
-  // No need to disconnect - Qt automatically handles this when objects are
-  // destroyed. Attempting to disconnect here could cause use-after-free since
-  // parsers may already be deleted
 
   // Clear the list (autoDelete already handled deletion)
   m_parsers.clear();

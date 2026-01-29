@@ -39,7 +39,7 @@ Rectangle {
         text: root.wheelPos + ":"
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: tempText.top
-        font.pixelSize: Math.max(10, 14 * root.scaleFactor)
+        font.pixelSize: Math.max(8, 12 * root.scaleFactor)  // Reduced for visual balance
         color: "turquoise"
     }
 
@@ -48,7 +48,7 @@ Rectangle {
         text: root.currentTemp + "°C"
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.top
-        font.pixelSize: Math.max(11, 16 * root.scaleFactor)
+        font.pixelSize: Math.max(9, 13 * root.scaleFactor)  // Reduced for visual balance
         font.family: "DS-Digital"
         color: root.getColorForTemperature(root.currentTemp)
     }

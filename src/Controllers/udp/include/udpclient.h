@@ -7,6 +7,7 @@
 #include <QThreadPool>
 #include <QAtomicInt>
 #include <QNetworkDatagram>
+#include <QTimer>
 #include <atomic>
 
 // Forward declarations
@@ -133,6 +134,11 @@ private slots:
 
     void handleDatagramReceived(const QByteArray &data); // Receives raw datagrams from the receiver worker and dispatches them to parser workers.
 
+    /**
+     * @brief Flush pending updates to QML at 60Hz rate
+     */
+    void flushPendingUpdates();
+
 private:
     // Worker threads
     QThread m_receiverThread;            // Dedicated thread for the receiver worker
@@ -145,6 +151,10 @@ private:
     // Configuration
     int m_parserThreadCount;
     bool m_debugMode;
+
+    // Update throttling (60Hz)
+    QTimer *m_updateTimer;
+    std::atomic<bool> m_pendingUpdate;
 
     // Performance tracking
     std::atomic<qint64> m_datagramsProcessed;

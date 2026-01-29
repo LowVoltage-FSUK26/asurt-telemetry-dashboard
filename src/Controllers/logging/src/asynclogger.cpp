@@ -8,7 +8,8 @@ AsyncLogger &AsyncLogger::instance() {
 }
 
 AsyncLogger::AsyncLogger(QObject *parent)
-    : QObject(parent), m_worker(nullptr), m_initialized(false) {}
+    : QObject(parent), m_worker(nullptr), m_logDirectory(QString()),
+      m_initialized(false), m_debugMode(false) {}
 
 AsyncLogger::~AsyncLogger() { shutdown(); }
 
@@ -37,8 +38,8 @@ void AsyncLogger::initialize(const QString &logDirectory) {
     }
   }
 
-  // Create worker and move to thread
-  m_worker = new LoggerWorker(m_logDirectory);
+  // Create worker and move to thread (debug logging disabled by default)
+  m_worker = new LoggerWorker(m_logDirectory, m_debugMode);
   m_worker->moveToThread(&m_workerThread);
 
   // Connect signals for log entries and shutdown
@@ -62,7 +63,9 @@ void AsyncLogger::initialize(const QString &logDirectory) {
   QThread::msleep(100);
 
   m_initialized = true;
-  qDebug() << "AsyncLogger initialized with log directory:" << m_logDirectory;
+  if (m_debugMode) {
+    qDebug() << "AsyncLogger initialized with log directory:" << m_logDirectory;
+  }
 }
 
 void AsyncLogger::shutdown() {
@@ -88,7 +91,9 @@ void AsyncLogger::shutdown() {
   }
 
   m_initialized = false;
-  qDebug() << "AsyncLogger shutdown complete";
+  if (m_debugMode) {
+    qDebug() << "AsyncLogger shutdown complete";
+  }
 }
 
 void AsyncLogger::logIMU(int16_t ang_x, int16_t ang_y, int16_t ang_z) {
@@ -125,20 +130,25 @@ void AsyncLogger::logSuspension(uint16_t sus_1, uint16_t sus_2, uint16_t sus_3,
 
 // LoggerWorker implementation
 
-LoggerWorker::LoggerWorker(const QString &logDir)
-    : m_logDirectory(logDir), m_filesOpen(false) {}
+LoggerWorker::LoggerWorker(const QString &logDir, bool debugMode)
+    : m_logDirectory(logDir), m_imuFile(), m_suspensionFile(), m_imuStream(),
+      m_suspensionStream(), m_filesOpen(false), m_debugMode(debugMode) {}
 
 LoggerWorker::~LoggerWorker() { closeFiles(); }
 
 void LoggerWorker::initialize() {
-  qDebug() << "LoggerWorker::initialize() called - log directory:"
-           << m_logDirectory;
+  if (m_debugMode) {
+    qDebug() << "LoggerWorker::initialize() called - log directory:"
+             << m_logDirectory;
+  }
 
   // Verify directory exists or create it
   QDir dir(m_logDirectory);
   if (!dir.exists()) {
-    qDebug() << "LoggerWorker: Directory doesn't exist, creating:"
-             << m_logDirectory;
+    if (m_debugMode) {
+      qDebug() << "LoggerWorker: Directory doesn't exist, creating:"
+               << m_logDirectory;
+    }
     if (!dir.mkpath(".")) {
       qWarning() << "LoggerWorker: Failed to create directory:"
                  << m_logDirectory;
@@ -149,11 +159,15 @@ void LoggerWorker::initialize() {
 
   // Get absolute path for clarity
   QString absPath = dir.absolutePath();
-  qDebug() << "LoggerWorker: Using absolute log directory:" << absPath;
+  if (m_debugMode) {
+    qDebug() << "LoggerWorker: Using absolute log directory:" << absPath;
+  }
 
   if (openFiles()) {
     m_filesOpen = true;
-    qDebug() << "LoggerWorker: Log files opened successfully in:" << absPath;
+    if (m_debugMode) {
+      qDebug() << "LoggerWorker: Log files opened successfully in:" << absPath;
+    }
   } else {
     qWarning() << "LoggerWorker: Failed to open log files in:" << absPath;
     m_filesOpen = false;
@@ -215,8 +229,10 @@ void LoggerWorker::writeHeader(QTextStream &stream, const QString &header) {
 }
 
 void LoggerWorker::processEntry(const LogEntry &entry) {
-  qDebug() << "LoggerWorker::processEntry() received entry type:" << entry.type
-           << "data:" << entry.data;
+  if (m_debugMode) {
+    qDebug() << "LoggerWorker::processEntry() received entry type:" << entry.type
+             << "data:" << entry.data;
+  }
 
   // Ensure files are open before processing
   if (!m_filesOpen) {
@@ -243,7 +259,9 @@ void LoggerWorker::processEntry(const LogEntry &entry) {
   if (stream) {
     *stream << entry.timestamp << "," << entry.data << "\n";
     stream->flush(); // Ensure data is written immediately
-    qDebug() << "LoggerWorker: Written entry to file";
+    if (m_debugMode) {
+      qDebug() << "LoggerWorker: Written entry to file";
+    }
   } else {
     qWarning() << "LoggerWorker: Unknown log entry type:" << entry.type;
   }

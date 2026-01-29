@@ -110,6 +110,13 @@ void MqttParserWorker::run() {
 void MqttParserWorker::queueMessage(const QByteArray &data) {
   QMutexLocker locker(&m_queueMutex);
 
+  // Drop oldest messages if queue is too deep (prevents unbounded growth)
+  // This ensures we always have the most recent data when under high load
+  static const int MAX_QUEUE_DEPTH = 50;
+  while (m_queue.size() >= MAX_QUEUE_DEPTH) {
+    m_queue.dequeue();
+  }
+
   // Add message to queue
   m_queue.enqueue(data);
 

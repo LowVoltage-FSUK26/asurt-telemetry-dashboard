@@ -39,7 +39,7 @@ Q_DECLARE_METATYPE(LogEntry)
 class LoggerWorker : public QObject {
   Q_OBJECT
 public:
-  explicit LoggerWorker(const QString &logDir);
+  explicit LoggerWorker(const QString &logDir, bool debugMode = false);
   ~LoggerWorker();
 
 public slots:
@@ -54,6 +54,7 @@ private:
   QTextStream m_imuStream;
   QTextStream m_suspensionStream;
   bool m_filesOpen;
+  bool m_debugMode;
 
   bool openFiles();
   void closeFiles();
@@ -109,6 +110,7 @@ private:
   LoggerWorker *m_worker;
   QString m_logDirectory;
   bool m_initialized;
+  bool m_debugMode;
 
 signals:
   void logEntryReady(const LogEntry &entry);

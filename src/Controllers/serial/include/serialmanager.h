@@ -6,6 +6,7 @@
 #include <QThread>
 #include <QThreadPool>
 #include <QAtomicInt>
+#include <QTimer>
 #include <atomic>
 
 // Forward declarations
@@ -108,6 +109,11 @@ private slots:
     void handleError(const QString &error);
     void handleSerialDataReceived(const QByteArray &data);
 
+    /**
+     * @brief Flush pending updates to QML at 60Hz rate
+     */
+    void flushPendingUpdates();
+
 private:
     QThread m_receiverThread;
     SerialReceiverWorker *m_receiverWorker;
@@ -118,6 +124,10 @@ private:
 
     int m_parserThreadCount;
     bool m_debugMode;
+
+    // Update throttling (60Hz)
+    QTimer *m_updateTimer;
+    std::atomic<bool> m_pendingUpdate;
 
     std::atomic<qint64> m_datagramsProcessed;
     std::atomic<qint64> m_datagramsDropped;

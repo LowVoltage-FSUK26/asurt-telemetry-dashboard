@@ -60,6 +60,13 @@ void SerialParserWorker::resetSharedState() {
 
 void SerialParserWorker::queueData(const QByteArray &data) {
   QMutexLocker locker(&m_mutex);
+
+  // Drop oldest messages if queue is too deep (prevents unbounded growth)
+  static const int MAX_QUEUE_DEPTH = 50;
+  while (m_dataQueue.size() >= MAX_QUEUE_DEPTH) {
+    m_dataQueue.dequeue();
+  }
+
   m_dataQueue.enqueue(data);
   m_waitCondition.wakeOne();
 }

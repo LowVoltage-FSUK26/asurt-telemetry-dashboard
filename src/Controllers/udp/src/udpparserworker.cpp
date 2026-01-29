@@ -94,6 +94,12 @@ void UdpParserWorker::queueDatagram(const QByteArray &data)
 {
     QMutexLocker locker(&m_queueMutex);
 
+    // Drop oldest datagrams if queue is too deep (prevents unbounded growth)
+    static const int MAX_QUEUE_DEPTH = 50;
+    while (m_queue.size() >= MAX_QUEUE_DEPTH) {
+        m_queue.dequeue();
+    }
+
     // Add datagram to queue
     m_queue.enqueue(data);
 
