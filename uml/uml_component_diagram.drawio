@@ -1,0 +1,163 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/28.2.5 Chrome/138.0.7204.251 Electron/37.6.1 Safari/537.36" version="28.2.5">
+  <diagram id="component-diagram" name="Component Diagram">
+    <mxGraphModel dx="1364" dy="843" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="system-container" value="&lt;b&gt;Telemetry Dashboard System&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1A3438;strokeColor=#A6F1E0;strokeWidth=3;fontColor=#FFFFFF;fontSize=16;verticalAlign=top;spacingTop=10;" parent="1" vertex="1">
+          <mxGeometry x="40" y="40" width="1080" height="720" as="geometry" />
+        </mxCell>
+        <mxCell id="ui-layer" value="&lt;b&gt;Presentation Layer (QML)&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2D5A5A;strokeColor=#A6F1E0;strokeWidth=2;fontColor=#FFFFFF;fontSize=12;verticalAlign=top;spacingTop=5;dashed=1;" parent="1" vertex="1">
+          <mxGeometry x="60" y="80" width="320" height="280" as="geometry" />
+        </mxCell>
+        <mxCell id="qml-ui" value="QML UI&#xa;src/UI/" style="shape=component;align=center;spacingLeft=36;rounded=1;fillColor=#09122C;strokeColor=#D84040;strokeWidth=2;fontColor=#FFFFFF;fontSize=11;fontStyle=1" parent="1" vertex="1">
+          <mxGeometry x="80" y="120" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="info-page" value="InformationPage&#xa;Dashboard Views" style="shape=component;align=center;spacingLeft=36;rounded=1;fillColor=#09122C;strokeColor=#636363;strokeWidth=1;fontColor=#FFFFFF;fontSize=10;fontStyle=1" parent="1" vertex="1">
+          <mxGeometry x="85" y="200" width="130" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="welcome-page" value="&lt;b&gt;WelcomePage&lt;/b&gt;&#xa;Session Setup" style="shape=component;align=center;spacingLeft=36;rounded=1;fillColor=#09122C;strokeColor=#636363;strokeWidth=1;fontColor=#FFFFFF;fontSize=10;" parent="1" vertex="1">
+          <mxGeometry x="90" y="260" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="status-bar" value="&lt;b&gt;StatusBar&lt;/b&gt;&#xa;Time/Session Info" style="shape=component;align=center;spacingLeft=36;rounded=1;fillColor=#09122C;strokeColor=#636363;strokeWidth=1;fontColor=#FFFFFF;fontSize=10;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="220" y="200" width="150" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="gauges" value="&lt;b&gt;Gauges&lt;/b&gt;&#xa;Speedometer, RPM" style="shape=component;align=center;spacingLeft=36;rounded=1;fillColor=#09122C;strokeColor=#636363;strokeWidth=1;fontColor=#FFFFFF;fontSize=10;" parent="1" vertex="1">
+          <mxGeometry x="220" y="260" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="controller-layer" value="&lt;b&gt;Business Logic Layer (C++)&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2D5A5A;strokeColor=#A6F1E0;strokeWidth=2;fontColor=#FFFFFF;fontSize=12;verticalAlign=top;spacingTop=5;dashed=1;" parent="1" vertex="1">
+          <mxGeometry x="420" y="80" width="680" height="280" as="geometry" />
+        </mxCell>
+        <mxCell id="comm-manager" value="&lt;b&gt;CommunicationManager&lt;/b&gt;&#xa;&#xa;«Facade»&#xa;Unified Data Interface&#xa;15 Q_PROPERTY bindings" style="shape=component;align=center;spacingLeft=36;rounded=1;fillColor=#D84040;strokeColor=#FFFFFF;strokeWidth=2;fontColor=#FFFFFF;fontSize=11;" parent="1" vertex="1">
+          <mxGeometry x="540" y="120" width="180" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="mqtt-client" value="&lt;b&gt;MqttClient&lt;/b&gt;&#xa;&#xa;MQTT Protocol&#xa;TLS Support" style="shape=component;align=center;spacingLeft=36;rounded=1;fillColor=#09122C;strokeColor=#A6F1E0;strokeWidth=2;fontColor=#FFFFFF;fontSize=10;" parent="1" vertex="1">
+          <mxGeometry x="440" y="240" width="140" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="udp-client" value="&lt;b&gt;UdpClient&lt;/b&gt;&#xa;&#xa;UDP Protocol&#xa;Low Latency" style="shape=component;align=center;spacingLeft=36;rounded=1;fillColor=#09122C;strokeColor=#A6F1E0;strokeWidth=2;fontColor=#FFFFFF;fontSize=10;" parent="1" vertex="1">
+          <mxGeometry x="600" y="240" width="140" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="serial-manager" value="&lt;b&gt;SerialManager&lt;/b&gt;&#xa;&#xa;Serial Protocol&#xa;Wired Connection" style="shape=component;align=center;spacingLeft=36;rounded=1;fillColor=#09122C;strokeColor=#A6F1E0;strokeWidth=2;fontColor=#FFFFFF;fontSize=10;" parent="1" vertex="1">
+          <mxGeometry x="760" y="240" width="140" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="can-decoder" value="&lt;b&gt;CanDecoder&lt;/b&gt;&#xa;CAN Frame Parser" style="shape=component;align=center;spacingLeft=36;rounded=1;fillColor=#09122C;strokeColor=#636363;strokeWidth=1;fontColor=#FFFFFF;fontSize=10;" parent="1" vertex="1">
+          <mxGeometry x="920" y="120" width="140" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="async-logger" value="&lt;b&gt;AsyncLogger&lt;/b&gt;&#xa;«Singleton»&#xa;CSV Logging" style="shape=component;align=center;spacingLeft=36;rounded=1;fillColor=#09122C;strokeColor=#636363;strokeWidth=1;fontColor=#FFFFFF;fontSize=10;" parent="1" vertex="1">
+          <mxGeometry x="920" y="190" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="data-layer" value="&lt;b&gt;Data Acquisition Layer&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2D5A5A;strokeColor=#A6F1E0;strokeWidth=2;fontColor=#FFFFFF;fontSize=12;verticalAlign=top;spacingTop=5;dashed=1;" parent="1" vertex="1">
+          <mxGeometry x="60" y="400" width="1040" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="mqtt-receiver" value="&lt;b&gt;MqttReceiverWorker&lt;/b&gt;&#xa;Dedicated Thread" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#636363;strokeColor=#FFFFFF;fontColor=#FFFFFF;fontSize=9;" parent="1" vertex="1">
+          <mxGeometry x="100" y="450" width="130" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="mqtt-parser" value="&lt;b&gt;MqttParserWorker&lt;/b&gt;&#xa;Thread Pool" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#636363;strokeColor=#FFFFFF;fontColor=#FFFFFF;fontSize=9;" parent="1" vertex="1">
+          <mxGeometry x="100" y="510" width="130" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="udp-receiver" value="&lt;b&gt;UdpReceiverWorker&lt;/b&gt;&#xa;QUdpSocket" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#636363;strokeColor=#FFFFFF;fontColor=#FFFFFF;fontSize=9;" parent="1" vertex="1">
+          <mxGeometry x="280" y="450" width="130" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="udp-parser" value="&lt;b&gt;UdpParserWorker&lt;/b&gt;&#xa;Thread Pool" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#636363;strokeColor=#FFFFFF;fontColor=#FFFFFF;fontSize=9;" parent="1" vertex="1">
+          <mxGeometry x="280" y="510" width="130" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="serial-receiver" value="&lt;b&gt;SerialReceiverWorker&lt;/b&gt;&#xa;QSerialPort" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#636363;strokeColor=#FFFFFF;fontColor=#FFFFFF;fontSize=9;" parent="1" vertex="1">
+          <mxGeometry x="460" y="450" width="130" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="serial-parser" value="&lt;b&gt;SerialParserWorker&lt;/b&gt;&#xa;Thread Pool" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#636363;strokeColor=#FFFFFF;fontColor=#FFFFFF;fontSize=9;" parent="1" vertex="1">
+          <mxGeometry x="460" y="510" width="130" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="logger-worker" value="&lt;b&gt;LoggerWorker&lt;/b&gt;&#xa;File I/O Thread" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#636363;strokeColor=#FFFFFF;fontColor=#FFFFFF;fontSize=9;" parent="1" vertex="1">
+          <mxGeometry x="640" y="480" width="130" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="mqtt-broker" value="&lt;b&gt;MQTT Broker&lt;/b&gt;&#xa;HiveMQ Cloud" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#4A4A4A;strokeColor=#A6F1E0;fontColor=#FFFFFF;fontSize=10;" parent="1" vertex="1">
+          <mxGeometry x="820" y="440" width="100" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="hardware" value="&lt;b&gt;Vehicle ECU&lt;/b&gt;&#xa;CAN/Serial/UDP" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#4A4A4A;strokeColor=#D84040;fontColor=#FFFFFF;fontSize=10;" parent="1" vertex="1">
+          <mxGeometry x="950" y="440" width="100" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="log-files" value="&lt;b&gt;Log Files&lt;/b&gt;&#xa;CSV (logs/)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#4A4A4A;strokeColor=#636363;fontColor=#FFFFFF;fontSize=10;" parent="1" vertex="1">
+          <mxGeometry x="820" y="530" width="100" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="conn-ui-comm" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#A6F1E0;strokeWidth=2;endArrow=open;endFill=0;" parent="1" source="qml-ui" target="comm-manager" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="conn-ui-comm-label" value="Q_PROPERTY&#xa;Binding" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontColor=#FFFFFF;fontSize=9;" parent="conn-ui-comm" vertex="1" connectable="0">
+          <mxGeometry x="-0.2" y="1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="conn-comm-mqtt" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#A6F1E0;strokeWidth=1;endArrow=diamond;endFill=1;" parent="1" source="comm-manager" target="mqtt-client" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="conn-comm-udp" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#A6F1E0;strokeWidth=1;endArrow=diamond;endFill=1;" parent="1" source="comm-manager" target="udp-client" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="conn-comm-serial" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#A6F1E0;strokeWidth=1;endArrow=diamond;endFill=1;" parent="1" source="comm-manager" target="serial-manager" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="conn-mqtt-worker" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#636363;strokeWidth=1;dashed=1;endArrow=open;endFill=0;" parent="1" source="mqtt-client" target="mqtt-receiver" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="conn-udp-worker" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#636363;strokeWidth=1;dashed=1;endArrow=open;endFill=0;" parent="1" source="udp-client" target="udp-receiver" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="conn-serial-worker" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#636363;strokeWidth=1;dashed=1;endArrow=open;endFill=0;" parent="1" source="serial-manager" target="serial-receiver" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="conn-comm-logger" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#636363;strokeWidth=1;dashed=1;endArrow=open;endFill=0;" parent="1" source="comm-manager" target="async-logger" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="conn-logger-worker" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#636363;strokeWidth=1;dashed=1;endArrow=open;endFill=0;" parent="1" source="async-logger" target="logger-worker" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="conn-logger-files" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#636363;strokeWidth=1;endArrow=open;endFill=0;" parent="1" source="logger-worker" target="log-files" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="conn-mqtt-broker" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#A6F1E0;strokeWidth=1;endArrow=open;endFill=0;" parent="1" source="mqtt-receiver" target="mqtt-broker" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="conn-hw-udp" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D84040;strokeWidth=1;endArrow=open;endFill=0;" parent="1" source="hardware" target="udp-receiver" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1000" y="420" />
+              <mxPoint x="345" y="420" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="conn-hw-serial" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#D84040;strokeWidth=1;endArrow=open;endFill=0;" parent="1" source="hardware" target="serial-receiver" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1000" y="420" />
+              <mxPoint x="525" y="420" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="legend" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1A3438;strokeColor=#636363;strokeWidth=1;" parent="1" vertex="1">
+          <mxGeometry x="60" y="620" width="300" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-title" value="&lt;b&gt;Legend&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#FFFFFF;fontSize=11;" parent="1" vertex="1">
+          <mxGeometry x="70" y="625" width="100" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-component" value="Component" style="shape=component;align=center;spacingLeft=20;rounded=1;fillColor=#09122C;strokeColor=#A6F1E0;strokeWidth=1;fontColor=#FFFFFF;fontSize=9;" parent="1" vertex="1">
+          <mxGeometry x="70" y="650" width="80" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-worker" value="Worker Thread" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#636363;strokeColor=#FFFFFF;fontColor=#FFFFFF;fontSize=9;" parent="1" vertex="1">
+          <mxGeometry x="160" y="650" width="90" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-external" value="External" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=10;fillColor=#4A4A4A;strokeColor=#A6F1E0;fontColor=#FFFFFF;fontSize=9;" parent="1" vertex="1">
+          <mxGeometry x="260" y="645" width="60" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-agg" value="◆ Aggregation" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#A6F1E0;fontSize=9;" parent="1" vertex="1">
+          <mxGeometry x="70" y="690" width="80" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-dep" value="--- Dependency" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#636363;fontSize=9;" parent="1" vertex="1">
+          <mxGeometry x="160" y="690" width="80" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-data" value="→ Data Flow" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#D84040;fontSize=9;" parent="1" vertex="1">
+          <mxGeometry x="250" y="690" width="80" height="20" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

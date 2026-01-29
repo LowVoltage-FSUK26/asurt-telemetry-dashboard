@@ -1,0 +1,334 @@
+<mxfile host="app.diagrams.net" modified="2024-01-01T00:00:00.000Z" agent="Mozilla/5.0" version="22.1.0" type="device">
+  <diagram id="sequence-diagram" name="Sequence Diagram">
+    <mxGraphModel dx="1600" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Title -->
+        <mxCell id="title" value="&lt;b&gt;Telemetry Dashboard - Data Flow Sequence Diagram&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#1A3438;fontSize=20;" vertex="1" parent="1">
+          <mxGeometry x="500" y="20" width="500" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- Actors/Participants -->
+        <!-- Vehicle ECU -->
+        <mxCell id="actor-vehicle" value="&lt;b&gt;Vehicle ECU&lt;/b&gt;&#xa;(Hardware)" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#D84040;strokeColor=#FFFFFF;fontColor=#1A3438;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="60" y="80" width="40" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- ReceiverWorker -->
+        <mxCell id="part-receiver" value="&lt;b&gt;ReceiverWorker&lt;/b&gt;&#xa;(Dedicated Thread)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#636363;strokeColor=#FFFFFF;fontColor=#FFFFFF;fontSize=10;align=center;" vertex="1" parent="1">
+          <mxGeometry x="180" y="80" width="120" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- ParserWorker -->
+        <mxCell id="part-parser" value="&lt;b&gt;ParserWorker&lt;/b&gt;&#xa;(Thread Pool)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#636363;strokeColor=#FFFFFF;fontColor=#FFFFFF;fontSize=10;align=center;" vertex="1" parent="1">
+          <mxGeometry x="360" y="80" width="120" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- Protocol Client -->
+        <mxCell id="part-client" value="&lt;b&gt;Protocol Client&lt;/b&gt;&#xa;(Udp/Serial/Mqtt)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#09122C;strokeColor=#A6F1E0;fontColor=#FFFFFF;fontSize=10;align=center;" vertex="1" parent="1">
+          <mxGeometry x="540" y="80" width="120" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- CommunicationManager -->
+        <mxCell id="part-comm" value="&lt;b&gt;CommunicationManager&lt;/b&gt;&#xa;(Facade)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D84040;strokeColor=#FFFFFF;fontColor=#FFFFFF;fontSize=10;align=center;" vertex="1" parent="1">
+          <mxGeometry x="720" y="80" width="140" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- QML UI -->
+        <mxCell id="part-qml" value="&lt;b&gt;QML UI&lt;/b&gt;&#xa;(Dashboard)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1A3438;strokeColor=#A6F1E0;fontColor=#FFFFFF;fontSize=10;align=center;" vertex="1" parent="1">
+          <mxGeometry x="920" y="80" width="100" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- AsyncLogger -->
+        <mxCell id="part-logger" value="&lt;b&gt;AsyncLogger&lt;/b&gt;&#xa;(Singleton)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#09122C;strokeColor=#636363;fontColor=#FFFFFF;fontSize=10;align=center;" vertex="1" parent="1">
+          <mxGeometry x="1080" y="80" width="100" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- CSV Files -->
+        <mxCell id="actor-files" value="&lt;b&gt;CSV Files&lt;/b&gt;&#xa;(logs/)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=10;fillColor=#4A4A4A;strokeColor=#636363;fontColor=#FFFFFF;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1240" y="80" width="80" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- Lifelines -->
+        <mxCell id="lifeline-vehicle" value="" style="endArrow=none;dashed=1;html=1;rounded=0;strokeColor=#636363;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="80" y="160" as="sourcePoint" />
+            <mxPoint x="80" y="900" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="lifeline-receiver" value="" style="endArrow=none;dashed=1;html=1;rounded=0;strokeColor=#636363;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="240" y="130" as="sourcePoint" />
+            <mxPoint x="240" y="900" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="lifeline-parser" value="" style="endArrow=none;dashed=1;html=1;rounded=0;strokeColor=#636363;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="420" y="130" as="sourcePoint" />
+            <mxPoint x="420" y="900" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="lifeline-client" value="" style="endArrow=none;dashed=1;html=1;rounded=0;strokeColor=#636363;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="600" y="130" as="sourcePoint" />
+            <mxPoint x="600" y="900" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="lifeline-comm" value="" style="endArrow=none;dashed=1;html=1;rounded=0;strokeColor=#636363;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="790" y="130" as="sourcePoint" />
+            <mxPoint x="790" y="900" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="lifeline-qml" value="" style="endArrow=none;dashed=1;html=1;rounded=0;strokeColor=#636363;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="970" y="130" as="sourcePoint" />
+            <mxPoint x="970" y="900" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="lifeline-logger" value="" style="endArrow=none;dashed=1;html=1;rounded=0;strokeColor=#636363;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="1130" y="130" as="sourcePoint" />
+            <mxPoint x="1130" y="900" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="lifeline-files" value="" style="endArrow=none;dashed=1;html=1;rounded=0;strokeColor=#636363;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="1280" y="130" as="sourcePoint" />
+            <mxPoint x="1280" y="900" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Activation Boxes -->
+        <mxCell id="act-receiver" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#636363;strokeColor=#FFFFFF;" vertex="1" parent="1">
+          <mxGeometry x="235" y="180" width="10" height="680" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="act-parser" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#636363;strokeColor=#FFFFFF;" vertex="1" parent="1">
+          <mxGeometry x="415" y="260" width="10" height="120" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="act-client" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#09122C;strokeColor=#A6F1E0;" vertex="1" parent="1">
+          <mxGeometry x="595" y="220" width="10" height="400" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="act-comm" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#D84040;strokeColor=#FFFFFF;" vertex="1" parent="1">
+          <mxGeometry x="785" y="420" width="10" height="340" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="act-qml" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1A3438;strokeColor=#A6F1E0;" vertex="1" parent="1">
+          <mxGeometry x="965" y="580" width="10" height="180" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="act-logger" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#09122C;strokeColor=#636363;" vertex="1" parent="1">
+          <mxGeometry x="1125" y="680" width="10" height="100" as="geometry" />
+        </mxCell>
+        
+        <!-- Messages -->
+        
+        <!-- 1. Vehicle sends data -->
+        <mxCell id="msg1" value="" style="endArrow=block;endFill=1;html=1;rounded=0;strokeColor=#D84040;strokeWidth=2;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="80" y="200" as="sourcePoint" />
+            <mxPoint x="235" y="200" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="msg1-label" value="1. sendTelemetryData(rawBytes)" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontColor=#D84040;fontSize=10;fontStyle=1;" vertex="1" connectable="0" parent="msg1">
+          <mxGeometry x="-0.1" y="-1" relative="1" as="geometry">
+            <mxPoint y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- 2. Receiver emits signal -->
+        <mxCell id="msg2" value="" style="endArrow=block;endFill=1;html=1;rounded=0;strokeColor=#A6F1E0;strokeWidth=2;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="245" y="260" as="sourcePoint" />
+            <mxPoint x="595" y="260" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="msg2-label" value="2. emit dataReceived(QByteArray)" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontColor=#A6F1E0;fontSize=10;fontStyle=1;" vertex="1" connectable="0" parent="msg2">
+          <mxGeometry x="-0.1" y="-1" relative="1" as="geometry">
+            <mxPoint y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- 3. Client dispatches to parser -->
+        <mxCell id="msg3" value="" style="endArrow=block;endFill=1;html=1;rounded=0;strokeColor=#636363;strokeWidth=2;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="595" y="300" as="sourcePoint" />
+            <mxPoint x="415" y="300" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="msg3-label" value="3. dispatchToParser(data) [round-robin]" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontColor=#636363;fontSize=10;fontStyle=1;" vertex="1" connectable="0" parent="msg3">
+          <mxGeometry x="-0.1" y="-1" relative="1" as="geometry">
+            <mxPoint y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- 4. Parser parses data -->
+        <mxCell id="msg4" value="" style="endArrow=block;endFill=1;html=1;rounded=0;strokeColor=#636363;strokeWidth=1;dashed=1;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="420" y="320" as="sourcePoint" />
+            <mxPoint x="420" y="350" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="460" y="320" />
+              <mxPoint x="460" y="350" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="msg4-note" value="4. parseData()&#xa;   - Decode CAN frames&#xa;   - Extract telemetry values" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#636363;strokeColor=#FFFFFF;fontColor=#FFFFFF;fontSize=9;align=left;spacingLeft=5;" vertex="1" parent="1">
+          <mxGeometry x="440" y="310" width="140" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- 5. Parser emits parsed data -->
+        <mxCell id="msg5" value="" style="endArrow=block;endFill=1;html=1;rounded=0;strokeColor=#A6F1E0;strokeWidth=2;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="425" y="380" as="sourcePoint" />
+            <mxPoint x="595" y="380" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="msg5-label" value="5. emit parsedData(speed, rpm, ...)" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontColor=#A6F1E0;fontSize=10;fontStyle=1;" vertex="1" connectable="0" parent="msg5">
+          <mxGeometry x="-0.1" y="-1" relative="1" as="geometry">
+            <mxPoint y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- 6. Client updates atomic values -->
+        <mxCell id="msg6-note" value="6. Update atomic values&#xa;   m_speed.store(speed)&#xa;   m_rpm.store(rpm)&#xa;   ..." style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#09122C;strokeColor=#A6F1E0;fontColor=#FFFFFF;fontSize=9;align=left;spacingLeft=5;" vertex="1" parent="1">
+          <mxGeometry x="500" y="400" width="130" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- 7. Client emits signals to CommunicationManager -->
+        <mxCell id="msg7" value="" style="endArrow=block;endFill=1;html=1;rounded=0;strokeColor=#A6F1E0;strokeWidth=2;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="605" y="480" as="sourcePoint" />
+            <mxPoint x="785" y="480" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="msg7-label" value="7. emit speedChanged(speed)" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontColor=#A6F1E0;fontSize=10;fontStyle=1;" vertex="1" connectable="0" parent="msg7">
+          <mxGeometry x="-0.1" y="-1" relative="1" as="geometry">
+            <mxPoint y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- 8. CommunicationManager handles signal -->
+        <mxCell id="msg8-note" value="8. handleUdpSpeedChanged()&#xa;   m_speed = newSpeed&#xa;   emit speedChanged(m_speed)" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#D84040;strokeColor=#FFFFFF;fontColor=#FFFFFF;fontSize=9;align=left;spacingLeft=5;" vertex="1" parent="1">
+          <mxGeometry x="680" y="500" width="170" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- 9. Q_PROPERTY binding triggers QML update -->
+        <mxCell id="msg9" value="" style="endArrow=block;endFill=1;html=1;rounded=0;strokeColor=#A6F1E0;strokeWidth=2;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="795" y="600" as="sourcePoint" />
+            <mxPoint x="965" y="600" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="msg9-label" value="9. Q_PROPERTY binding → auto update" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontColor=#A6F1E0;fontSize=10;fontStyle=1;" vertex="1" connectable="0" parent="msg9">
+          <mxGeometry x="-0.1" y="-1" relative="1" as="geometry">
+            <mxPoint y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- 10. QML UI updates display -->
+        <mxCell id="msg10-note" value="10. Speedometer.qml&#xa;    speed: communicationManager.speed&#xa;    → Canvas repaints automatically" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#1A3438;strokeColor=#A6F1E0;fontColor=#FFFFFF;fontSize=9;align=left;spacingLeft=5;" vertex="1" parent="1">
+          <mxGeometry x="860" y="620" width="180" height="55" as="geometry" />
+        </mxCell>
+        
+        <!-- 11. CommunicationManager logs data -->
+        <mxCell id="msg11" value="" style="endArrow=block;endFill=1;html=1;rounded=0;strokeColor=#636363;strokeWidth=1;dashed=1;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="795" y="700" as="sourcePoint" />
+            <mxPoint x="1125" y="700" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="msg11-label" value="11. AsyncLogger::instance().logIMU(x, y, z)" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontColor=#636363;fontSize=10;fontStyle=1;" vertex="1" connectable="0" parent="msg11">
+          <mxGeometry x="-0.1" y="-1" relative="1" as="geometry">
+            <mxPoint y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- 12. Logger queues entry -->
+        <mxCell id="msg12-note" value="12. emit logEntryReady(entry)&#xa;    [Qt::QueuedConnection]" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#09122C;strokeColor=#636363;fontColor=#FFFFFF;fontSize=9;align=left;spacingLeft=5;" vertex="1" parent="1">
+          <mxGeometry x="1040" y="720" width="160" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- 13. LoggerWorker writes to file -->
+        <mxCell id="msg13" value="" style="endArrow=block;endFill=1;html=1;rounded=0;strokeColor=#636363;strokeWidth=1;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="1135" y="780" as="sourcePoint" />
+            <mxPoint x="1280" y="780" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="msg13-label" value="13. write CSV row (non-blocking)" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontColor=#636363;fontSize=10;fontStyle=1;" vertex="1" connectable="0" parent="msg13">
+          <mxGeometry x="-0.1" y="-1" relative="1" as="geometry">
+            <mxPoint y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Loop indicator -->
+        <mxCell id="loop-box" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#A6F1E0;strokeWidth=2;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="170" width="1240" height="700" as="geometry" />
+        </mxCell>
+        <mxCell id="loop-label" value="&lt;b&gt;loop&lt;/b&gt; [continuous telemetry stream]" style="text;html=1;strokeColor=none;fillColor=#1A3438;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#A6F1E0;fontSize=11;spacingLeft=5;" vertex="1" parent="1">
+          <mxGeometry x="60" y="170" width="230" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- Alt fragment for protocol selection -->
+        <mxCell id="alt-box" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#636363;strokeWidth=1;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="70" y="195" width="200" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="alt-label" value="&lt;b&gt;alt&lt;/b&gt; [protocol]" style="text;html=1;strokeColor=none;fillColor=#636363;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#FFFFFF;fontSize=9;spacingLeft=3;" vertex="1" parent="1">
+          <mxGeometry x="70" y="195" width="80" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="alt-udp" value="[UDP]: QUdpSocket" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#636363;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="80" y="215" width="120" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="alt-serial" value="[Serial]: QSerialPort" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#636363;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="80" y="235" width="120" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="alt-mqtt" value="[MQTT]: QMqttClient" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#636363;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="80" y="255" width="120" height="16" as="geometry" />
+        </mxCell>
+        
+        <!-- Legend -->
+        <mxCell id="legend-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1A3438;strokeColor=#A6F1E0;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="920" width="600" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-title" value="&lt;b&gt;Legend&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#FFFFFF;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="70" y="925" width="60" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend-sync" value="━━━► Synchronous call" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#A6F1E0;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="70" y="950" width="140" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend-async" value="- - -► Async signal/slot" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#636363;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="220" y="950" width="140" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend-data" value="━━━► Data flow" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#D84040;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="370" y="950" width="100" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend-activation" value="█ Activation box (processing)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#FFFFFF;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="480" y="950" width="170" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend-threads" value="Threads: Main (QML), Receiver, Parser Pool, Logger" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#FFFFFF;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="70" y="970" width="300" height="20" as="geometry" />
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
+

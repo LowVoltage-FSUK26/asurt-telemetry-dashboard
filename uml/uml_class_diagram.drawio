@@ -1,0 +1,156 @@
+<mxfile host="app.diagrams.net" modified="2024-01-01T00:00:00.000Z" agent="Mozilla/5.0" version="22.1.0" type="device">
+  <diagram id="class-diagram" name="Class Diagram">
+    <mxGraphModel dx="1800" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Title -->
+        <mxCell id="title" value="Telemetry Dashboard - Class Diagram" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#1A3438;fontSize=20;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="560" y="10" width="380" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- CommunicationManager Class -->
+        <mxCell id="comm-manager-box" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;CommunicationManager&lt;/b&gt;&lt;br/&gt;«Facade»&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0px;margin-left:4px;font-size:10px;font-family:monospace;&quot;&gt;- m_udpClient: UdpClient*&lt;br/&gt;- m_serialManager: SerialManager*&lt;br/&gt;- m_mqttClient: MqttClient*&lt;br/&gt;- m_currentSource: SourceType&lt;br/&gt;- m_speed: float&lt;br/&gt;- m_rpm: int&lt;br/&gt;- m_accPedal: int&lt;br/&gt;- m_brakePedal: int&lt;br/&gt;- m_encoderAngle: double&lt;br/&gt;- m_temperature: float&lt;br/&gt;- m_batteryLevel: int&lt;br/&gt;- m_gpsLongitude: double&lt;br/&gt;- m_gpsLatitude: double&lt;br/&gt;- m_speedFL/FR/BL/BR: int&lt;br/&gt;- m_lateralG: double&lt;br/&gt;- m_longitudinalG: double&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0px;margin-left:4px;font-size:10px;font-family:monospace;&quot;&gt;+ startSerial(port, baud): bool&lt;br/&gt;+ startUdp(port): bool&lt;br/&gt;+ startMqtt(broker, ...): bool&lt;br/&gt;+ stop(): bool&lt;br/&gt;+ speed(), rpm(), ... getters&lt;br/&gt;&lt;br/&gt;«signals»&lt;br/&gt;+ speedChanged(float)&lt;br/&gt;+ rpmChanged(int)&lt;br/&gt;+ errorOccurred(QString)&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;html=1;rounded=1;fillColor=#D84040;strokeColor=#FFFFFF;strokeWidth=2;fontColor=#FFFFFF;" parent="1" vertex="1">
+          <mxGeometry x="560" y="50" width="280" height="380" as="geometry" />
+        </mxCell>
+        
+        <!-- MqttClient Class -->
+        <mxCell id="mqtt-client-box" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;MqttClient&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0px;margin-left:4px;font-size:9px;font-family:monospace;&quot;&gt;- m_receiverThread: QThread&lt;br/&gt;- m_receiverWorker: MqttReceiverWorker*&lt;br/&gt;- m_parserPool: QThreadPool&lt;br/&gt;- m_parsers: QList&amp;lt;MqttParserWorker*&amp;gt;&lt;br/&gt;- m_nextParserIndex: int&lt;br/&gt;- m_parserThreadCount: int&lt;br/&gt;- m_debugMode: bool&lt;br/&gt;- m_speed: std::atomic&amp;lt;float&amp;gt;&lt;br/&gt;- m_rpm: std::atomic&amp;lt;int&amp;gt;&lt;br/&gt;... (15 atomic properties)&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0px;margin-left:4px;font-size:9px;font-family:monospace;&quot;&gt;+ start(broker, port, tls, ...): bool&lt;br/&gt;+ stop(): bool&lt;br/&gt;+ setParserThreadCount(count): void&lt;br/&gt;+ setDebugMode(enabled): void&lt;br/&gt;+ speed(), rpm(), ... getters&lt;br/&gt;- initializeParsers(): void&lt;br/&gt;- cleanupParsers(): void&lt;br/&gt;- handleParsedData(...): void&lt;br/&gt;- handleMqttMessageReceived(msg): void&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;html=1;rounded=1;fillColor=#09122C;strokeColor=#A6F1E0;strokeWidth=2;fontColor=#FFFFFF;" parent="1" vertex="1">
+          <mxGeometry x="40" y="490" width="260" height="310" as="geometry" />
+        </mxCell>
+        
+        <!-- UdpClient Class -->
+        <mxCell id="udp-client-box" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;UdpClient&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0px;margin-left:4px;font-size:9px;font-family:monospace;&quot;&gt;- m_receiverThread: QThread&lt;br/&gt;- m_receiverWorker: UdpReceiverWorker*&lt;br/&gt;- m_parserPool: QThreadPool&lt;br/&gt;- m_parsers: QList&amp;lt;UdpParserWorker*&amp;gt;&lt;br/&gt;- m_nextParserIndex: int&lt;br/&gt;- m_datagramsProcessed: atomic&amp;lt;qint64&amp;gt;&lt;br/&gt;- m_datagramsDropped: atomic&amp;lt;qint64&amp;gt;&lt;br/&gt;- m_speed: std::atomic&amp;lt;float&amp;gt;&lt;br/&gt;- m_rpm: std::atomic&amp;lt;int&amp;gt;&lt;br/&gt;... (15 atomic properties)&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0px;margin-left:4px;font-size:9px;font-family:monospace;&quot;&gt;+ start(port): bool&lt;br/&gt;+ stop(): bool&lt;br/&gt;+ setParserThreadCount(count): void&lt;br/&gt;+ setDebugMode(enabled): void&lt;br/&gt;+ speed(), rpm(), ... getters&lt;br/&gt;- initializeParsers(): void&lt;br/&gt;- cleanupParsers(): void&lt;br/&gt;- handleParsedData(...): void&lt;br/&gt;- handleDatagramReceived(data): void&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;html=1;rounded=1;fillColor=#09122C;strokeColor=#A6F1E0;strokeWidth=2;fontColor=#FFFFFF;" parent="1" vertex="1">
+          <mxGeometry x="340" y="490" width="260" height="310" as="geometry" />
+        </mxCell>
+        
+        <!-- SerialManager Class -->
+        <mxCell id="serial-manager-box" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;SerialManager&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0px;margin-left:4px;font-size:9px;font-family:monospace;&quot;&gt;- m_receiverThread: QThread&lt;br/&gt;- m_receiverWorker: SerialReceiverWorker*&lt;br/&gt;- m_parserPool: QThreadPool&lt;br/&gt;- m_parsers: QList&amp;lt;SerialParserWorker*&amp;gt;&lt;br/&gt;- m_nextParserIndex: int&lt;br/&gt;- m_datagramsProcessed: atomic&amp;lt;qint64&amp;gt;&lt;br/&gt;- m_datagramsDropped: atomic&amp;lt;qint64&amp;gt;&lt;br/&gt;- m_speed: std::atomic&amp;lt;float&amp;gt;&lt;br/&gt;- m_rpm: std::atomic&amp;lt;int&amp;gt;&lt;br/&gt;... (15 atomic properties)&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0px;margin-left:4px;font-size:9px;font-family:monospace;&quot;&gt;+ start(portName, baudRate): bool&lt;br/&gt;+ stop(): bool&lt;br/&gt;+ setParserThreadCount(count): void&lt;br/&gt;+ setDebugMode(enabled): void&lt;br/&gt;+ speed(), rpm(), ... getters&lt;br/&gt;- initializeParsers(): void&lt;br/&gt;- cleanupParsers(): void&lt;br/&gt;- handleParsedData(...): void&lt;br/&gt;- handleSerialDataReceived(data): void&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;html=1;rounded=1;fillColor=#09122C;strokeColor=#A6F1E0;strokeWidth=2;fontColor=#FFFFFF;" parent="1" vertex="1">
+          <mxGeometry x="640" y="490" width="260" height="310" as="geometry" />
+        </mxCell>
+        
+        <!-- AsyncLogger Class -->
+        <mxCell id="async-logger-box" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;AsyncLogger&lt;/b&gt;&lt;br/&gt;«Singleton»&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0px;margin-left:4px;font-size:9px;font-family:monospace;&quot;&gt;- m_workerThread: QThread&lt;br/&gt;- m_worker: LoggerWorker*&lt;br/&gt;- m_logDirectory: QString&lt;br/&gt;- m_initialized: bool&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0px;margin-left:4px;font-size:9px;font-family:monospace;&quot;&gt;+ instance(): AsyncLogger&amp;amp;&lt;br/&gt;+ initialize(logDir): void&lt;br/&gt;+ shutdown(): void&lt;br/&gt;+ logIMU(x, y, z): void&lt;br/&gt;+ logSuspension(s1..s4): void&lt;br/&gt;+ logTemperature(t1..t4): void&lt;br/&gt;&lt;br/&gt;«signals»&lt;br/&gt;+ logEntryReady(LogEntry)&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;html=1;rounded=1;fillColor=#09122C;strokeColor=#636363;strokeWidth=2;fontColor=#FFFFFF;" parent="1" vertex="1">
+          <mxGeometry x="940" y="490" width="220" height="230" as="geometry" />
+        </mxCell>
+        
+        <!-- CanDecoder Class -->
+        <mxCell id="can-decoder-box" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;CanDecoder&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0px;margin-left:4px;font-size:9px;font-family:monospace;&quot;&gt;+ decodeFrame(frame): TelemetryData&lt;br/&gt;+ parseSpeed(data): float&lt;br/&gt;+ parseRpm(data): int&lt;br/&gt;+ parseGps(data): GpsCoord&lt;br/&gt;+ parseAccelerometer(data): Vector3D&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;html=1;rounded=1;fillColor=#09122C;strokeColor=#636363;strokeWidth=2;fontColor=#FFFFFF;" parent="1" vertex="1">
+          <mxGeometry x="940" y="750" width="220" height="120" as="geometry" />
+        </mxCell>
+        
+        <!-- LogEntry Struct -->
+        <mxCell id="log-entry-box" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;LogEntry&lt;/b&gt;&lt;br/&gt;«struct»&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0px;margin-left:4px;font-size:9px;font-family:monospace;&quot;&gt;+ type: Type (IMU|SUSPENSION|TEMP)&lt;br/&gt;+ timestamp: qint64&lt;br/&gt;+ data: QString&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0px;margin-left:4px;font-size:9px;font-family:monospace;&quot;&gt;+ LogEntry()&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;html=1;rounded=1;fillColor=#636363;strokeColor=#FFFFFF;strokeWidth=1;fontColor=#FFFFFF;" parent="1" vertex="1">
+          <mxGeometry x="1200" y="490" width="200" height="130" as="geometry" />
+        </mxCell>
+        
+        <!-- LoggerWorker Class -->
+        <mxCell id="logger-worker-box" value="&lt;p style=&quot;margin:0px;margin-top:4px;text-align:center;&quot;&gt;&lt;b&gt;LoggerWorker&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0px;margin-left:4px;font-size:9px;font-family:monospace;&quot;&gt;- m_logDirectory: QString&lt;br/&gt;- m_imuFile: QFile&lt;br/&gt;- m_suspensionFile: QFile&lt;br/&gt;- m_temperatureFile: QFile&lt;/p&gt;&lt;hr size=&quot;1&quot;/&gt;&lt;p style=&quot;margin:0px;margin-left:4px;font-size:9px;font-family:monospace;&quot;&gt;+ processEntry(entry): void&lt;br/&gt;+ initialize(): void&lt;br/&gt;+ shutdown(): void&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;html=1;rounded=1;fillColor=#636363;strokeColor=#FFFFFF;strokeWidth=1;fontColor=#FFFFFF;" parent="1" vertex="1">
+          <mxGeometry x="1200" y="650" width="200" height="160" as="geometry" />
+        </mxCell>
+        
+        <!-- Worker Classes (small boxes) -->
+        <mxCell id="mqtt-receiver-worker" value="&lt;b&gt;MqttReceiverWorker&lt;/b&gt;&lt;br/&gt;(QObject)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#636363;strokeColor=#FFFFFF;fontColor=#FFFFFF;fontSize=9;align=center;" parent="1" vertex="1">
+          <mxGeometry x="40" y="840" width="120" height="40" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="mqtt-parser-worker" value="&lt;b&gt;MqttParserWorker&lt;/b&gt;&lt;br/&gt;(QRunnable)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#636363;strokeColor=#FFFFFF;fontColor=#FFFFFF;fontSize=9;align=center;" parent="1" vertex="1">
+          <mxGeometry x="170" y="840" width="120" height="40" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="udp-receiver-worker" value="&lt;b&gt;UdpReceiverWorker&lt;/b&gt;&lt;br/&gt;(QObject)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#636363;strokeColor=#FFFFFF;fontColor=#FFFFFF;fontSize=9;align=center;" parent="1" vertex="1">
+          <mxGeometry x="340" y="840" width="120" height="40" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="udp-parser-worker" value="&lt;b&gt;UdpParserWorker&lt;/b&gt;&lt;br/&gt;(QRunnable)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#636363;strokeColor=#FFFFFF;fontColor=#FFFFFF;fontSize=9;align=center;" parent="1" vertex="1">
+          <mxGeometry x="470" y="840" width="120" height="40" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="serial-receiver-worker" value="&lt;b&gt;SerialReceiverWorker&lt;/b&gt;&lt;br/&gt;(QObject)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#636363;strokeColor=#FFFFFF;fontColor=#FFFFFF;fontSize=9;align=center;" parent="1" vertex="1">
+          <mxGeometry x="640" y="840" width="120" height="40" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="serial-parser-worker" value="&lt;b&gt;SerialParserWorker&lt;/b&gt;&lt;br/&gt;(QRunnable)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#636363;strokeColor=#FFFFFF;fontColor=#FFFFFF;fontSize=9;align=center;" parent="1" vertex="1">
+          <mxGeometry x="770" y="840" width="120" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- Relationships -->
+        <!-- Aggregation: CommunicationManager owns clients -->
+        <mxCell id="rel-comm-mqtt" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#A6F1E0;strokeWidth=2;endArrow=diamondThin;endFill=1;endSize=12;exitX=0.25;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="comm-manager-box" target="mqtt-client-box" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rel-comm-mqtt-label" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontColor=#FFFFFF;fontSize=10;" parent="rel-comm-mqtt" vertex="1" connectable="0">
+          <mxGeometry x="0.8" y="-1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="rel-comm-udp" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#A6F1E0;strokeWidth=2;endArrow=diamondThin;endFill=1;endSize=12;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="comm-manager-box" target="udp-client-box" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rel-comm-udp-label" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontColor=#FFFFFF;fontSize=10;" parent="rel-comm-udp" vertex="1" connectable="0">
+          <mxGeometry x="0.8" y="-1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="rel-comm-serial" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#A6F1E0;strokeWidth=2;endArrow=diamondThin;endFill=1;endSize=12;exitX=0.75;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="comm-manager-box" target="serial-manager-box" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rel-comm-serial-label" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontColor=#FFFFFF;fontSize=10;" parent="rel-comm-serial" vertex="1" connectable="0">
+          <mxGeometry x="0.8" y="-1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Dependency: Clients use workers -->
+        <mxCell id="rel-mqtt-workers" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#636363;strokeWidth=1;dashed=1;endArrow=open;endFill=0;" parent="1" source="mqtt-client-box" target="mqtt-receiver-worker" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="rel-udp-workers" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#636363;strokeWidth=1;dashed=1;endArrow=open;endFill=0;" parent="1" source="udp-client-box" target="udp-receiver-worker" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="rel-serial-workers" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#636363;strokeWidth=1;dashed=1;endArrow=open;endFill=0;" parent="1" source="serial-manager-box" target="serial-receiver-worker" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- AsyncLogger uses LoggerWorker -->
+        <mxCell id="rel-logger-worker" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#636363;strokeWidth=1;dashed=1;endArrow=open;endFill=0;" parent="1" source="async-logger-box" target="logger-worker-box" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- AsyncLogger uses LogEntry -->
+        <mxCell id="rel-logger-entry" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#636363;strokeWidth=1;dashed=1;endArrow=open;endFill=0;" parent="1" source="async-logger-box" target="log-entry-box" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Legend -->
+        <mxCell id="legend-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1A3438;strokeColor=#A6F1E0;strokeWidth=1;" parent="1" vertex="1">
+          <mxGeometry x="40" y="920" width="450" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-title" value="&lt;b&gt;Legend&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#FFFFFF;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="50" y="925" width="60" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-agg" value="◆─── Aggregation (owns)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#A6F1E0;fontSize=10;" parent="1" vertex="1">
+          <mxGeometry x="50" y="950" width="150" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-dep" value="- - - → Dependency (uses)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#636363;fontSize=10;" parent="1" vertex="1">
+          <mxGeometry x="200" y="950" width="150" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-facade" value="Red = Facade Pattern" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#D84040;fontSize=10;" parent="1" vertex="1">
+          <mxGeometry x="50" y="970" width="130" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-singleton" value="Gray Border = Supporting Classes" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#636363;fontSize=10;" parent="1" vertex="1">
+          <mxGeometry x="200" y="970" width="200" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-teal" value="Teal Border = Protocol Clients" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#A6F1E0;fontSize=10;" parent="1" vertex="1">
+          <mxGeometry x="350" y="950" width="140" height="20" as="geometry" />
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
