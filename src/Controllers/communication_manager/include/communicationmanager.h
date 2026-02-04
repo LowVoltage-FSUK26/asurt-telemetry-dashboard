@@ -70,6 +70,8 @@ public:
     bool isSerialSource() const { return m_isSerialSource; }
     void setIsSerialSource(bool isSerialSource);
 
+    enum class SourceType { None, Serial, Udp, Mqtt };
+
 signals:
     void speedChanged(float newSpeed);
     void rpmChanged(int newRpm);
@@ -94,69 +96,29 @@ signals:
     void errorOccurred(const QString &error);
 
 private slots:
-    void handleUdpSpeedChanged(float newSpeed);
-    void handleUdpRpmChanged(int newRpm);
-    void handleUdpAccPedalChanged(int newAccPedal);
-    void handleUdpBrakePedalChanged(int newBrakePedal);
-    void handleUdpEncoderAngleChanged(double newAngle);
-    void handleUdpTemperatureChanged(float newTemperature);
-    void handleUdpBatteryLevelChanged(int newBatteryLevel);
-    void handleUdpGpsLongitudeChanged(double newLongitude);
-    void handleUdpGpsLatitudeChanged(double newGpsLatitude);
-    void handleUdpSpeedFLChanged(int newSpeedFL);
-    void handleUdpSpeedFRChanged(int newSpeedFR);
-    void handleUdpSpeedBLChanged(int newSpeedBL);
-    void handleUdpSpeedBRChanged(int newSpeedBR);
-    void handleUdpLateralGChanged(double newLateralG);
-    void handleUdpLongitudinalGChanged(double newLongitudinalG);
-    void handleUdpTempFLChanged(int newTempFL);
-    void handleUdpTempFRChanged(int newTempFR);
-    void handleUdpTempBLChanged(int newTempBL);
-    void handleUdpTempBRChanged(int newTempBR);
-    void handleUdpError(const QString &error);
 
-    void handleSerialSpeedChanged(float newSpeed);
-    void handleSerialRpmChanged(int newRpm);
-    void handleSerialAccPedalChanged(int newAccPedal);
-    void handleSerialBrakePedalChanged(int newBrakePedal);
-    void handleSerialEncoderAngleChanged(double newAngle);
-    void handleSerialTemperatureChanged(float newTemperature);
-    void handleSerialBatteryLevelChanged(int newBatteryLevel);
-    void handleSerialGpsLongitudeChanged(double newLongitude);
-    void handleSerialGpsLatitudeChanged(double newGpsLatitude);
-    void handleSerialSpeedFLChanged(int newSpeedFL);
-    void handleSerialSpeedFRChanged(int newSpeedFR);
-    void handleSerialSpeedBLChanged(int newSpeedBL);
-    void handleSerialSpeedBRChanged(int newSpeedBR);
-    void handleSerialLateralGChanged(double newLateralG);
-    void handleSerialLongitudinalGChanged(double newLongitudinalG);
-    void handleSerialTempFLChanged(int newTempFL);
-    void handleSerialTempFRChanged(int newTempFR);
-    void handleSerialTempBLChanged(int newTempBL);
-    void handleSerialTempBRChanged(int newTempBR);
-    void handleSerialError(const QString &error);
-
-
-    void handleMqttSpeedChanged(float newSpeed);
-    void handleMqttRpmChanged(int newRpm);
-    void handleMqttAccPedalChanged(int newAccPedal);
-    void handleMqttBrakePedalChanged(int newBrakePedal);
-    void handleMqttEncoderAngleChanged(double newAngle);
-    void handleMqttTemperatureChanged(float newTemperature);
-    void handleMqttBatteryLevelChanged(int newBatteryLevel);
-    void handleMqttGpsLongitudeChanged(double newLongitude);
-    void handleMqttGpsLatitudeChanged(double newGpsLatitude);
-    void handleMqttSpeedFLChanged(int newSpeedFL);
-    void handleMqttSpeedFRChanged(int newSpeedFR);
-    void handleMqttSpeedBLChanged(int newSpeedBL);
-    void handleMqttSpeedBRChanged(int newSpeedBR);
-    void handleMqttLateralGChanged(double newLateralG);
-    void handleMqttLongitudinalGChanged(double newLongitudinalG);
-    void handleMqttTempFLChanged(int newTempFL);
-    void handleMqttTempFRChanged(int newTempFR);
-    void handleMqttTempBLChanged(int newTempBL);
-    void handleMqttTempBRChanged(int newTempBR);
-    void handleMqttError(const QString &error);
+    void handleSpeedChanged(float newSpeed, CommunicationManager::SourceType source);
+    void handleRpmChanged(int newRpm, CommunicationManager::SourceType source);
+    void handleAccPedalChanged(int newAccPedal, CommunicationManager::SourceType source);
+    void handleBrakePedalChanged(int newBrakePedal, CommunicationManager::SourceType source);
+    void handleEncoderAngleChanged(double newAngle, CommunicationManager::SourceType source);
+    void handleTemperatureChanged(float newTemperature, CommunicationManager::SourceType source);
+    void handleBatteryLevelChanged(int newBatteryLevel, CommunicationManager::SourceType source);
+    void handleGpsLongitudeChanged(double newLongitude, CommunicationManager::SourceType source);
+    void handleGpsLatitudeChanged(double newGpsLatitude, CommunicationManager::SourceType source);
+    void handleSpeedFLChanged(int newSpeedFL, CommunicationManager::SourceType source);
+    void handleSpeedFRChanged(int newSpeedFR, CommunicationManager::SourceType source);
+    void handleSpeedBLChanged(int newSpeedBL, CommunicationManager::SourceType source);
+    void handleSpeedBRChanged(int newSpeedBR, CommunicationManager::SourceType source);
+    void handleLateralGChanged(double newLateralG, CommunicationManager::SourceType source);
+    void handleLongitudinalGChanged(double newLongitudinalG, CommunicationManager::SourceType source);
+    void handleTempFLChanged(int newTempFL, CommunicationManager::SourceType source);
+    void handleTempFRChanged(int newTempFR, CommunicationManager::SourceType source);
+    void handleTempBLChanged(int newTempBL, CommunicationManager::SourceType source);
+    void handleTempBRChanged(int newTempBR, CommunicationManager::SourceType source);
+    
+    // Error Handler
+    void handleError(const QString &error);
 
 private:
 
@@ -165,8 +127,6 @@ private:
     SerialManager *m_serialManager;
     MqttClient *m_mqttClient;
 
-
-    enum class SourceType { None, Serial, Udp, Mqtt };
     SourceType m_currentSource;
 
     // Internal storage for properties

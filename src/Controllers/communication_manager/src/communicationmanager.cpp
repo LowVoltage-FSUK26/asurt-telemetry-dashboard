@@ -32,69 +32,69 @@ CommunicationManager::CommunicationManager(QObject *parent)
     m_isSerialSource(false)
 {
     // Connect signals from UdpClient to CommunicationManager's slots
-    connect(m_udpClient, &UdpClient::speedChanged, this, &CommunicationManager::handleUdpSpeedChanged);
-    connect(m_udpClient, &UdpClient::rpmChanged, this, &CommunicationManager::handleUdpRpmChanged);
-    connect(m_udpClient, &UdpClient::accPedalChanged, this, &CommunicationManager::handleUdpAccPedalChanged);
-    connect(m_udpClient, &UdpClient::brakePedalChanged, this, &CommunicationManager::handleUdpBrakePedalChanged);
-    connect(m_udpClient, &UdpClient::encoderAngleChanged, this, &CommunicationManager::handleUdpEncoderAngleChanged);
-    connect(m_udpClient, &UdpClient::temperatureChanged, this, &CommunicationManager::handleUdpTemperatureChanged);
-    connect(m_udpClient, &UdpClient::batteryLevelChanged, this, &CommunicationManager::handleUdpBatteryLevelChanged);
-    connect(m_udpClient, &UdpClient::gpsLongitudeChanged, this, &CommunicationManager::handleUdpGpsLongitudeChanged);
-    connect(m_udpClient, &UdpClient::gpsLatitudeChanged, this, &CommunicationManager::handleUdpGpsLatitudeChanged);
-    connect(m_udpClient, &UdpClient::speedFLChanged, this, &CommunicationManager::handleUdpSpeedFLChanged);
-    connect(m_udpClient, &UdpClient::speedFRChanged, this, &CommunicationManager::handleUdpSpeedFRChanged);
-    connect(m_udpClient, &UdpClient::speedBLChanged, this, &CommunicationManager::handleUdpSpeedBLChanged);
-    connect(m_udpClient, &UdpClient::speedBRChanged, this, &CommunicationManager::handleUdpSpeedBRChanged);
-    connect(m_udpClient, &UdpClient::lateralGChanged, this, &CommunicationManager::handleUdpLateralGChanged);
-    connect(m_udpClient, &UdpClient::longitudinalGChanged, this, &CommunicationManager::handleUdpLongitudinalGChanged);
-    connect(m_udpClient, &UdpClient::tempFLChanged, this, &CommunicationManager::handleUdpTempFLChanged);
-    connect(m_udpClient, &UdpClient::tempFRChanged, this, &CommunicationManager::handleUdpTempFRChanged);
-    connect(m_udpClient, &UdpClient::tempBLChanged, this, &CommunicationManager::handleUdpTempBLChanged);
-    connect(m_udpClient, &UdpClient::tempBRChanged, this, &CommunicationManager::handleUdpTempBRChanged);
-    connect(m_udpClient, &UdpClient::errorOccurred, this, &CommunicationManager::handleUdpError);
+    connect(m_udpClient, &UdpClient::speedChanged, this, [this](float newSpeed){ handleSpeedChanged(newSpeed, SourceType::Udp); });
+    connect(m_udpClient, &UdpClient::rpmChanged, this, [this](int newRPM){ handleRpmChanged(newRPM, SourceType::Udp); });
+    connect(m_udpClient, &UdpClient::accPedalChanged, this, [this](int newAccPedal){ handleAccPedalChanged(newAccPedal, SourceType::Udp); });
+    connect(m_udpClient, &UdpClient::brakePedalChanged, this, [this](int newBrakePedal){ handleBrakePedalChanged(newBrakePedal, SourceType::Udp); });
+    connect(m_udpClient, &UdpClient::encoderAngleChanged, this, [this](double newAngle){ handleEncoderAngleChanged(newAngle, SourceType::Udp); });
+    connect(m_udpClient, &UdpClient::temperatureChanged, this, [this](float newTemp){ handleTemperatureChanged(newTemp, SourceType::Udp); });
+    connect(m_udpClient, &UdpClient::batteryLevelChanged, this, [this](int newBatteryLevel){ handleBatteryLevelChanged(newBatteryLevel, SourceType::Udp); });
+    connect(m_udpClient, &UdpClient::gpsLongitudeChanged, this, [this](double newLongtitude){ handleGpsLongitudeChanged(newLongtitude, SourceType::Udp); });
+    connect(m_udpClient, &UdpClient::gpsLatitudeChanged, this, [this](double newLatitude){ handleGpsLatitudeChanged(newLatitude, SourceType::Udp); });
+    connect(m_udpClient, &UdpClient::speedFLChanged, this, [this](double newSpeedFL){ handleSpeedFLChanged(newSpeedFL, SourceType::Udp); });
+    connect(m_udpClient, &UdpClient::speedFRChanged, this, [this](double newSpeedFR){ handleSpeedFRChanged(newSpeedFR, SourceType::Udp); });
+    connect(m_udpClient, &UdpClient::speedBLChanged, this, [this](double newSpeedBL){ handleSpeedBLChanged(newSpeedBL, SourceType::Udp); });
+    connect(m_udpClient, &UdpClient::speedBRChanged, this, [this](double newSpeedBR){ handleSpeedBRChanged(newSpeedBR, SourceType::Udp); });
+    connect(m_udpClient, &UdpClient::lateralGChanged, this, [this](double newLateralG) { handleLateralGChanged(newLateralG, SourceType::Udp); });
+    connect(m_udpClient, &UdpClient::longitudinalGChanged, this, [this](double newLogitudinalG){ handleLongitudinalGChanged(newLogitudinalG, SourceType::Udp); });
+    connect(m_udpClient, &UdpClient::tempFLChanged, this, [this](int newTempFL) { handleTempFLChanged(newTempFL, SourceType::Udp); });
+    connect(m_udpClient, &UdpClient::tempFRChanged, this, [this](int newTempFR) { handleTempFRChanged(newTempFR, SourceType::Udp); });
+    connect(m_udpClient, &UdpClient::tempBLChanged, this, [this](int newTempBL) { handleTempBLChanged(newTempBL, SourceType::Udp); });
+    connect(m_udpClient, &UdpClient::tempBRChanged, this, [this](int newTempBR) { handleTempBRChanged(newTempBR, SourceType::Udp); });
+    connect(m_udpClient, &UdpClient::errorOccurred, this, &CommunicationManager::handleError);
 
     // Connect signals from SerialManager to CommunicationManager's slots
-    connect(m_serialManager, &SerialManager::speedChanged, this, &CommunicationManager::handleSerialSpeedChanged);
-    connect(m_serialManager, &SerialManager::rpmChanged, this, &CommunicationManager::handleSerialRpmChanged);
-    connect(m_serialManager, &SerialManager::accPedalChanged, this, &CommunicationManager::handleSerialAccPedalChanged);
-    connect(m_serialManager, &SerialManager::brakePedalChanged, this, &CommunicationManager::handleSerialBrakePedalChanged);
-    connect(m_serialManager, &SerialManager::encoderAngleChanged, this, &CommunicationManager::handleSerialEncoderAngleChanged);
-    connect(m_serialManager, &SerialManager::temperatureChanged, this, &CommunicationManager::handleSerialTemperatureChanged);
-    connect(m_serialManager, &SerialManager::batteryLevelChanged, this, &CommunicationManager::handleSerialBatteryLevelChanged);
-    connect(m_serialManager, &SerialManager::gpsLongitudeChanged, this, &CommunicationManager::handleSerialGpsLongitudeChanged);
-    connect(m_serialManager, &SerialManager::gpsLatitudeChanged, this, &CommunicationManager::handleSerialGpsLatitudeChanged);
-    connect(m_serialManager, &SerialManager::speedFLChanged, this, &CommunicationManager::handleSerialSpeedFLChanged);
-    connect(m_serialManager, &SerialManager::speedFRChanged, this, &CommunicationManager::handleSerialSpeedFRChanged);
-    connect(m_serialManager, &SerialManager::speedBLChanged, this, &CommunicationManager::handleSerialSpeedBLChanged);
-    connect(m_serialManager, &SerialManager::speedBRChanged, this, &CommunicationManager::handleSerialSpeedBRChanged);
-    connect(m_serialManager, &SerialManager::lateralGChanged, this, &CommunicationManager::handleSerialLateralGChanged);
-    connect(m_serialManager, &SerialManager::longitudinalGChanged, this, &CommunicationManager::handleSerialLongitudinalGChanged);
-    connect(m_serialManager, &SerialManager::tempFLChanged, this, &CommunicationManager::handleSerialTempFLChanged);
-    connect(m_serialManager, &SerialManager::tempFRChanged, this, &CommunicationManager::handleSerialTempFRChanged);
-    connect(m_serialManager, &SerialManager::tempBLChanged, this, &CommunicationManager::handleSerialTempBLChanged);
-    connect(m_serialManager, &SerialManager::tempBRChanged, this, &CommunicationManager::handleSerialTempBRChanged);
-    connect(m_serialManager, &SerialManager::errorOccurred, this, &CommunicationManager::handleSerialError);
+    connect(m_serialManager, &SerialManager::speedChanged, this, [this](float newSpeed){ handleSpeedChanged(newSpeed, SourceType::Serial); });
+    connect(m_serialManager, &SerialManager::rpmChanged, this, [this](int newRPM){ handleRpmChanged(newRPM, SourceType::Serial); });
+    connect(m_serialManager, &SerialManager::accPedalChanged, this, [this](int newAccPedal){ handleAccPedalChanged(newAccPedal, SourceType::Serial); });
+    connect(m_serialManager, &SerialManager::brakePedalChanged, this, [this](int newBrakePedal){ handleBrakePedalChanged(newBrakePedal, SourceType::Serial); });
+    connect(m_serialManager, &SerialManager::encoderAngleChanged, this, [this](double newAngle){ handleEncoderAngleChanged(newAngle, SourceType::Serial); });
+    connect(m_serialManager, &SerialManager::temperatureChanged, this, [this](float newTemp){ handleTemperatureChanged(newTemp, SourceType::Serial); });
+    connect(m_serialManager, &SerialManager::batteryLevelChanged, this, [this](int newBatteryLevel){ handleBatteryLevelChanged(newBatteryLevel, SourceType::Serial); });
+    connect(m_serialManager, &SerialManager::gpsLongitudeChanged, this, [this](double newLongtitude){ handleGpsLongitudeChanged(newLongtitude, SourceType::Serial); });
+    connect(m_serialManager, &SerialManager::gpsLatitudeChanged, this, [this](double newLatitude){ handleGpsLatitudeChanged(newLatitude, SourceType::Serial); });
+    connect(m_serialManager, &SerialManager::speedFLChanged, this, [this](double newSpeedFL){ handleSpeedFLChanged(newSpeedFL, SourceType::Serial); });
+    connect(m_serialManager, &SerialManager::speedFRChanged, this, [this](double newSpeedFR){ handleSpeedFRChanged(newSpeedFR, SourceType::Serial); });
+    connect(m_serialManager, &SerialManager::speedBLChanged, this, [this](double newSpeedBL){ handleSpeedBLChanged(newSpeedBL, SourceType::Serial); });
+    connect(m_serialManager, &SerialManager::speedBRChanged, this, [this](double newSpeedBR){ handleSpeedBRChanged(newSpeedBR, SourceType::Serial); });
+    connect(m_serialManager, &SerialManager::lateralGChanged, this, [this](double newLateralG) { handleLateralGChanged(newLateralG, SourceType::Serial); });
+    connect(m_serialManager, &SerialManager::longitudinalGChanged, this, [this](double newLogitudinalG){ handleLongitudinalGChanged(newLogitudinalG, SourceType::Serial); });
+    connect(m_serialManager, &SerialManager::tempFLChanged, this, [this](int newTempFL) { handleTempFLChanged(newTempFL, SourceType::Serial); });
+    connect(m_serialManager, &SerialManager::tempFRChanged, this, [this](int newTempFR) { handleTempFRChanged(newTempFR, SourceType::Serial); });
+    connect(m_serialManager, &SerialManager::tempBLChanged, this, [this](int newTempBL) { handleTempBLChanged(newTempBL, SourceType::Serial); });
+    connect(m_serialManager, &SerialManager::tempBRChanged, this, [this](int newTempBR) { handleTempBRChanged(newTempBR, SourceType::Serial); });
+    connect(m_serialManager, &SerialManager::errorOccurred, this, &CommunicationManager::handleError);
 
-    connect(m_mqttClient, &MqttClient::speedChanged, this, &CommunicationManager::handleMqttSpeedChanged);
-    connect(m_mqttClient, &MqttClient::rpmChanged, this, &CommunicationManager::handleMqttRpmChanged);
-    connect(m_mqttClient, &MqttClient::accPedalChanged, this, &CommunicationManager::handleMqttAccPedalChanged);
-    connect(m_mqttClient, &MqttClient::brakePedalChanged, this, &CommunicationManager::handleMqttBrakePedalChanged);
-    connect(m_mqttClient, &MqttClient::encoderAngleChanged, this, &CommunicationManager::handleMqttEncoderAngleChanged);
-    connect(m_mqttClient, &MqttClient::temperatureChanged, this, &CommunicationManager::handleMqttTemperatureChanged);
-    connect(m_mqttClient, &MqttClient::batteryLevelChanged, this, &CommunicationManager::handleMqttBatteryLevelChanged);
-    connect(m_mqttClient, &MqttClient::gpsLongitudeChanged, this, &CommunicationManager::handleMqttGpsLongitudeChanged);
-    connect(m_mqttClient, &MqttClient::gpsLatitudeChanged, this, &CommunicationManager::handleMqttGpsLatitudeChanged);
-    connect(m_mqttClient, &MqttClient::speedFLChanged, this, &CommunicationManager::handleMqttSpeedFLChanged);
-    connect(m_mqttClient, &MqttClient::speedFRChanged, this, &CommunicationManager::handleMqttSpeedFRChanged);
-    connect(m_mqttClient, &MqttClient::speedBLChanged, this, &CommunicationManager::handleMqttSpeedBLChanged);
-    connect(m_mqttClient, &MqttClient::speedBRChanged, this, &CommunicationManager::handleMqttSpeedBRChanged);
-    connect(m_mqttClient, &MqttClient::lateralGChanged, this, &CommunicationManager::handleMqttLateralGChanged);
-    connect(m_mqttClient, &MqttClient::longitudinalGChanged, this, &CommunicationManager::handleMqttLongitudinalGChanged);
-    connect(m_mqttClient, &MqttClient::tempFLChanged, this, &CommunicationManager::handleMqttTempFLChanged);
-    connect(m_mqttClient, &MqttClient::tempFRChanged, this, &CommunicationManager::handleMqttTempFRChanged);
-    connect(m_mqttClient, &MqttClient::tempBLChanged, this, &CommunicationManager::handleMqttTempBLChanged);
-    connect(m_mqttClient, &MqttClient::tempBRChanged, this, &CommunicationManager::handleMqttTempBRChanged);
-    connect(m_mqttClient, &MqttClient::errorOccurred, this, &CommunicationManager::handleMqttError);
+    connect(m_mqttClient, &MqttClient::speedChanged, this, [this](float newSpeed){ handleSpeedChanged(newSpeed, SourceType::Mqtt); });
+    connect(m_mqttClient, &MqttClient::rpmChanged, this, [this](int newRPM){ handleRpmChanged(newRPM, SourceType::Mqtt); });
+    connect(m_mqttClient, &MqttClient::accPedalChanged, this, [this](int newAccPedal){ handleAccPedalChanged(newAccPedal, SourceType::Mqtt); });
+    connect(m_mqttClient, &MqttClient::brakePedalChanged, this, [this](int newBrakePedal){ handleBrakePedalChanged(newBrakePedal, SourceType::Mqtt); });
+    connect(m_mqttClient, &MqttClient::encoderAngleChanged, this, [this](double newAngle){ handleEncoderAngleChanged(newAngle, SourceType::Mqtt); });
+    connect(m_mqttClient, &MqttClient::temperatureChanged, this, [this](float newTemp){ handleTemperatureChanged(newTemp, SourceType::Mqtt); });
+    connect(m_mqttClient, &MqttClient::batteryLevelChanged, this, [this](int newBatteryLevel){ handleBatteryLevelChanged(newBatteryLevel, SourceType::Mqtt); });
+    connect(m_mqttClient, &MqttClient::gpsLongitudeChanged, this, [this](double newLongtitude){ handleGpsLongitudeChanged(newLongtitude, SourceType::Mqtt); });
+    connect(m_mqttClient, &MqttClient::gpsLatitudeChanged, this, [this](double newLatitude){ handleGpsLatitudeChanged(newLatitude, SourceType::Mqtt); });
+    connect(m_mqttClient, &MqttClient::speedFLChanged, this, [this](double newSpeedFL){ handleSpeedFLChanged(newSpeedFL, SourceType::Mqtt); });
+    connect(m_mqttClient, &MqttClient::speedFRChanged, this, [this](double newSpeedFR){ handleSpeedFRChanged(newSpeedFR, SourceType::Mqtt); });
+    connect(m_mqttClient, &MqttClient::speedBLChanged, this, [this](double newSpeedBL){ handleSpeedBLChanged(newSpeedBL, SourceType::Mqtt); });
+    connect(m_mqttClient, &MqttClient::speedBRChanged, this, [this](double newSpeedBR){ handleSpeedBRChanged(newSpeedBR, SourceType::Mqtt); });
+    connect(m_mqttClient, &MqttClient::lateralGChanged, this, [this](double newLateralG) { handleLateralGChanged(newLateralG, SourceType::Mqtt); });
+    connect(m_mqttClient, &MqttClient::longitudinalGChanged, this, [this](double newLogitudinalG){ handleLongitudinalGChanged(newLogitudinalG, SourceType::Mqtt); });
+    connect(m_mqttClient, &MqttClient::tempFLChanged, this, [this](int newTempFL) { handleTempFLChanged(newTempFL, SourceType::Mqtt); });
+    connect(m_mqttClient, &MqttClient::tempFRChanged, this, [this](int newTempFR) { handleTempFRChanged(newTempFR, SourceType::Mqtt); });
+    connect(m_mqttClient, &MqttClient::tempBLChanged, this, [this](int newTempBL) { handleTempBLChanged(newTempBL, SourceType::Mqtt); });
+    connect(m_mqttClient, &MqttClient::tempBRChanged, this, [this](int newTempBR) { handleTempBRChanged(newTempBR, SourceType::Mqtt); });
+    connect(m_mqttClient, &MqttClient::errorOccurred, this, &CommunicationManager::handleError);
 }
 
 CommunicationManager::~CommunicationManager()
@@ -184,24 +184,14 @@ void CommunicationManager::setIsSerialSource(bool isSerialSource)
     }
 }
 
-void CommunicationManager::handleUdpError(const QString &error)
+void CommunicationManager::handleError(const QString &error)
 {
     emit errorOccurred(error);
 }
 
-void CommunicationManager::handleSerialError(const QString &error)
+void CommunicationManager::handleSpeedChanged(float newSpeed, SourceType source)
 {
-    emit errorOccurred(error);
-}
-
-void CommunicationManager::handleMqttError(const QString &error)
-{
-    emit errorOccurred(error);
-}
-
-void CommunicationManager::handleUdpSpeedChanged(float newSpeed)
-{
-    if (m_currentSource == SourceType::Udp)
+    if (m_currentSource == source)
     {
         if (m_speed != newSpeed)
         {
@@ -211,9 +201,9 @@ void CommunicationManager::handleUdpSpeedChanged(float newSpeed)
     }
 }
 
-void CommunicationManager::handleUdpRpmChanged(int newRpm)
+void CommunicationManager::handleRpmChanged(int newRpm, SourceType source)
 {
-    if (m_currentSource == SourceType::Udp)
+    if (m_currentSource == source)
     {
         if (m_rpm != newRpm)
         {
@@ -223,9 +213,9 @@ void CommunicationManager::handleUdpRpmChanged(int newRpm)
     }
 }
 
-void CommunicationManager::handleUdpAccPedalChanged(int newAccPedal)
+void CommunicationManager::handleAccPedalChanged(int newAccPedal, SourceType source)
 {
-    if (m_currentSource == SourceType::Udp)
+    if (m_currentSource == source)
     {
         if (m_accPedal != newAccPedal)
         {
@@ -235,9 +225,9 @@ void CommunicationManager::handleUdpAccPedalChanged(int newAccPedal)
     }
 }
 
-void CommunicationManager::handleUdpBrakePedalChanged(int newBrakePedal)
+void CommunicationManager::handleBrakePedalChanged(int newBrakePedal, SourceType source)
 {
-    if (m_currentSource == SourceType::Udp)
+    if (m_currentSource == source)
     {
         if (m_brakePedal != newBrakePedal)
         {
@@ -247,9 +237,9 @@ void CommunicationManager::handleUdpBrakePedalChanged(int newBrakePedal)
     }
 }
 
-void CommunicationManager::handleUdpEncoderAngleChanged(double newAngle)
+void CommunicationManager::handleEncoderAngleChanged(double newAngle, SourceType source)
 {
-    if (m_currentSource == SourceType::Udp)
+    if (m_currentSource == source)
     {
         if (m_encoderAngle != newAngle)
         {
@@ -259,9 +249,9 @@ void CommunicationManager::handleUdpEncoderAngleChanged(double newAngle)
     }
 }
 
-void CommunicationManager::handleUdpTemperatureChanged(float newTemperature)
+void CommunicationManager::handleTemperatureChanged(float newTemperature, SourceType source)
 {
-    if (m_currentSource == SourceType::Udp)
+    if (m_currentSource == source)
     {
         if (m_temperature != newTemperature)
         {
@@ -271,9 +261,9 @@ void CommunicationManager::handleUdpTemperatureChanged(float newTemperature)
     }
 }
 
-void CommunicationManager::handleUdpBatteryLevelChanged(int newBatteryLevel)
+void CommunicationManager::handleBatteryLevelChanged(int newBatteryLevel, SourceType source)
 {
-    if (m_currentSource == SourceType::Udp)
+    if (m_currentSource == source)
     {
         if (m_batteryLevel != newBatteryLevel)
         {
@@ -283,9 +273,9 @@ void CommunicationManager::handleUdpBatteryLevelChanged(int newBatteryLevel)
     }
 }
 
-void CommunicationManager::handleUdpGpsLongitudeChanged(double newLongitude)
+void CommunicationManager::handleGpsLongitudeChanged(double newLongitude, SourceType source)
 {
-    if (m_currentSource == SourceType::Udp)
+    if (m_currentSource == source)
     {
         if (m_gpsLongitude != newLongitude)
         {
@@ -295,9 +285,9 @@ void CommunicationManager::handleUdpGpsLongitudeChanged(double newLongitude)
     }
 }
 
-void CommunicationManager::handleUdpGpsLatitudeChanged(double newGpsLatitude)
+void CommunicationManager::handleGpsLatitudeChanged(double newGpsLatitude, SourceType source)
 {
-    if (m_currentSource == SourceType::Udp)
+    if (m_currentSource == source)
     {
         if (m_gpsLatitude != newGpsLatitude)
         {
@@ -307,9 +297,9 @@ void CommunicationManager::handleUdpGpsLatitudeChanged(double newGpsLatitude)
     }
 }
 
-void CommunicationManager::handleUdpSpeedFLChanged(int newSpeedFL)
+void CommunicationManager::handleSpeedFLChanged(int newSpeedFL, SourceType source)
 {
-    if (m_currentSource == SourceType::Udp)
+    if (m_currentSource == source)
     {
         if (m_speedFL != newSpeedFL)
         {
@@ -319,9 +309,9 @@ void CommunicationManager::handleUdpSpeedFLChanged(int newSpeedFL)
     }
 }
 
-void CommunicationManager::handleUdpSpeedFRChanged(int newSpeedFR)
+void CommunicationManager::handleSpeedFRChanged(int newSpeedFR, SourceType source)
 {
-    if (m_currentSource == SourceType::Udp)
+    if (m_currentSource == source)
     {
         if (m_speedFR != newSpeedFR)
         {
@@ -331,9 +321,9 @@ void CommunicationManager::handleUdpSpeedFRChanged(int newSpeedFR)
     }
 }
 
-void CommunicationManager::handleUdpSpeedBLChanged(int newSpeedBL)
+void CommunicationManager::handleSpeedBLChanged(int newSpeedBL, SourceType source)
 {
-    if (m_currentSource == SourceType::Udp)
+    if (m_currentSource == source)
     {
         if (m_speedBL != newSpeedBL)
         {
@@ -343,9 +333,9 @@ void CommunicationManager::handleUdpSpeedBLChanged(int newSpeedBL)
     }
 }
 
-void CommunicationManager::handleUdpSpeedBRChanged(int newSpeedBR)
+void CommunicationManager::handleSpeedBRChanged(int newSpeedBR, SourceType source)
 {
-    if (m_currentSource == SourceType::Udp)
+    if (m_currentSource == source)
     {
         if (m_speedBR != newSpeedBR)
         {
@@ -355,9 +345,9 @@ void CommunicationManager::handleUdpSpeedBRChanged(int newSpeedBR)
     }
 }
 
-void CommunicationManager::handleUdpLateralGChanged(double newLateralG)
+void CommunicationManager::handleLateralGChanged(double newLateralG, SourceType source)
 {
-    if (m_currentSource == SourceType::Udp)
+    if (m_currentSource == source)
     {
         if (m_lateralG != newLateralG)
         {
@@ -367,9 +357,9 @@ void CommunicationManager::handleUdpLateralGChanged(double newLateralG)
     }
 }
 
-void CommunicationManager::handleUdpLongitudinalGChanged(double newLongitudinalG)
+void CommunicationManager::handleLongitudinalGChanged(double newLongitudinalG, SourceType source)
 {
-    if (m_currentSource == SourceType::Udp)
+    if (m_currentSource == source)
     {
         if (m_longitudinalG != newLongitudinalG)
         {
@@ -379,9 +369,9 @@ void CommunicationManager::handleUdpLongitudinalGChanged(double newLongitudinalG
     }
 }
 
-void CommunicationManager::handleUdpTempFLChanged(int newTempFL)
+void CommunicationManager::handleTempFLChanged(int newTempFL, SourceType source)
 {
-    if (m_currentSource == SourceType::Udp)
+    if (m_currentSource == source)
     {
         if (m_tempFL != newTempFL)
         {
@@ -391,9 +381,9 @@ void CommunicationManager::handleUdpTempFLChanged(int newTempFL)
     }
 }
 
-void CommunicationManager::handleUdpTempFRChanged(int newTempFR)
+void CommunicationManager::handleTempFRChanged(int newTempFR, SourceType source)
 {
-    if (m_currentSource == SourceType::Udp)
+    if (m_currentSource == source)
     {
         if (m_tempFR != newTempFR)
         {
@@ -403,9 +393,9 @@ void CommunicationManager::handleUdpTempFRChanged(int newTempFR)
     }
 }
 
-void CommunicationManager::handleUdpTempBLChanged(int newTempBL)
+void CommunicationManager::handleTempBLChanged(int newTempBL, SourceType source)
 {
-    if (m_currentSource == SourceType::Udp)
+    if (m_currentSource == source)
     {
         if (m_tempBL != newTempBL)
         {
@@ -415,465 +405,9 @@ void CommunicationManager::handleUdpTempBLChanged(int newTempBL)
     }
 }
 
-void CommunicationManager::handleUdpTempBRChanged(int newTempBR)
+void CommunicationManager::handleTempBRChanged(int newTempBR, SourceType source)
 {
-    if (m_currentSource == SourceType::Udp)
-    {
-        if (m_tempBR != newTempBR)
-        {
-            m_tempBR = newTempBR;
-            emit tempBRChanged(m_tempBR);
-        }
-    }
-}
-
-void CommunicationManager::handleSerialSpeedChanged(float newSpeed)
-{
-    if (m_currentSource == SourceType::Serial)
-    {
-        if (m_speed != newSpeed)
-        {
-            m_speed = newSpeed;
-            emit speedChanged(m_speed);
-        }
-    }
-}
-
-void CommunicationManager::handleSerialRpmChanged(int newRpm)
-{
-    if (m_currentSource == SourceType::Serial)
-    {
-        if (m_rpm != newRpm)
-        {
-            m_rpm = newRpm;
-            emit rpmChanged(m_rpm);
-        }
-    }
-}
-
-void CommunicationManager::handleSerialAccPedalChanged(int newAccPedal)
-{
-    if (m_currentSource == SourceType::Serial)
-    {
-        if (m_accPedal != newAccPedal)
-        {
-            m_accPedal = newAccPedal;
-            emit accPedalChanged(m_accPedal);
-        }
-    }
-}
-
-void CommunicationManager::handleSerialBrakePedalChanged(int newBrakePedal)
-{
-    if (m_currentSource == SourceType::Serial)
-    {
-        if (m_brakePedal != newBrakePedal)
-        {
-            m_brakePedal = newBrakePedal;
-            emit brakePedalChanged(m_brakePedal);
-        }
-    }
-}
-
-void CommunicationManager::handleSerialEncoderAngleChanged(double newAngle)
-{
-    if (m_currentSource == SourceType::Serial)
-    {
-        if (m_encoderAngle != newAngle)
-        {
-            m_encoderAngle = newAngle;
-            emit encoderAngleChanged(m_encoderAngle);
-        }
-    }
-}
-
-void CommunicationManager::handleSerialTemperatureChanged(float newTemperature)
-{
-    if (m_currentSource == SourceType::Serial)
-    {
-        if (m_temperature != newTemperature)
-        {
-            m_temperature = newTemperature;
-            emit temperatureChanged(m_temperature);
-        }
-    }
-}
-
-void CommunicationManager::handleSerialBatteryLevelChanged(int newBatteryLevel)
-{
-    if (m_currentSource == SourceType::Serial)
-    {
-        if (m_batteryLevel != newBatteryLevel)
-        {
-            m_batteryLevel = newBatteryLevel;
-            emit batteryLevelChanged(m_batteryLevel);
-        }
-    }
-}
-
-void CommunicationManager::handleSerialGpsLongitudeChanged(double newLongitude)
-{
-    if (m_currentSource == SourceType::Serial)
-    {
-        if (m_gpsLongitude != newLongitude)
-        {
-            m_gpsLongitude = newLongitude;
-            emit gpsLongitudeChanged(m_gpsLongitude);
-        }
-    }
-}
-
-void CommunicationManager::handleSerialGpsLatitudeChanged(double newGpsLatitude)
-{
-    if (m_currentSource == SourceType::Serial)
-    {
-        if (m_gpsLatitude != newGpsLatitude)
-        {
-            m_gpsLatitude = newGpsLatitude;
-            emit gpsLatitudeChanged(m_gpsLatitude);
-        }
-    }
-}
-
-void CommunicationManager::handleSerialSpeedFLChanged(int newSpeedFL)
-{
-    if (m_currentSource == SourceType::Serial)
-    {
-        if (m_speedFL != newSpeedFL)
-        {
-            m_speedFL = newSpeedFL;
-            emit speedFLChanged(m_speedFL);
-        }
-    }
-}
-
-void CommunicationManager::handleSerialSpeedFRChanged(int newSpeedFR)
-{
-    if (m_currentSource == SourceType::Serial)
-    {
-        if (m_speedFR != newSpeedFR)
-        {
-            m_speedFR = newSpeedFR;
-            emit speedFRChanged(m_speedFR);
-        }
-    }
-}
-
-void CommunicationManager::handleSerialSpeedBLChanged(int newSpeedBL)
-{
-    if (m_currentSource == SourceType::Serial)
-    {
-        if (m_speedBL != newSpeedBL)
-        {
-            m_speedBL = newSpeedBL;
-            emit speedBLChanged(m_speedBL);
-        }
-    }
-}
-
-void CommunicationManager::handleSerialSpeedBRChanged(int newSpeedBR)
-{
-    if (m_currentSource == SourceType::Serial)
-    {
-        if (m_speedBR != newSpeedBR)
-        {
-            m_speedBR = newSpeedBR;
-            emit speedBRChanged(m_speedBR);
-        }
-    }
-}
-
-void CommunicationManager::handleSerialLateralGChanged(double newLateralG)
-{
-    if (m_currentSource == SourceType::Serial)
-    {
-        if (m_lateralG != newLateralG)
-        {
-            m_lateralG = newLateralG;
-            emit lateralGChanged(m_lateralG);
-        }
-    }
-}
-
-void CommunicationManager::handleSerialLongitudinalGChanged(double newLongitudinalG)
-{
-    if (m_currentSource == SourceType::Serial)
-    {
-        if (m_longitudinalG != newLongitudinalG)
-        {
-            m_longitudinalG = newLongitudinalG;
-            emit longitudinalGChanged(m_longitudinalG);
-        }
-    }
-}
-
-void CommunicationManager::handleSerialTempFLChanged(int newTempFL)
-{
-    if (m_currentSource == SourceType::Serial)
-    {
-        if (m_tempFL != newTempFL)
-        {
-            m_tempFL = newTempFL;
-            emit tempFLChanged(m_tempFL);
-        }
-    }
-}
-
-void CommunicationManager::handleSerialTempFRChanged(int newTempFR)
-{
-    if (m_currentSource == SourceType::Serial)
-    {
-        if (m_tempFR != newTempFR)
-        {
-            m_tempFR = newTempFR;
-            emit tempFRChanged(m_tempFR);
-        }
-    }
-}
-
-void CommunicationManager::handleSerialTempBLChanged(int newTempBL)
-{
-    if (m_currentSource == SourceType::Serial)
-    {
-        if (m_tempBL != newTempBL)
-        {
-            m_tempBL = newTempBL;
-            emit tempBLChanged(m_tempBL);
-        }
-    }
-}
-
-void CommunicationManager::handleSerialTempBRChanged(int newTempBR)
-{
-    if (m_currentSource == SourceType::Serial)
-    {
-        if (m_tempBR != newTempBR)
-        {
-            m_tempBR = newTempBR;
-            emit tempBRChanged(m_tempBR);
-        }
-    }
-}
-
-void CommunicationManager::handleMqttSpeedChanged(float newSpeed)
-{
-    if (m_currentSource == SourceType::Mqtt)
-    {
-        if (m_speed != newSpeed)
-        {
-            m_speed = newSpeed;
-            emit speedChanged(m_speed);
-        }
-    }
-}
-
-void CommunicationManager::handleMqttRpmChanged(int newRpm)
-{
-    if (m_currentSource == SourceType::Mqtt)
-    {
-        if (m_rpm != newRpm)
-        {
-            m_rpm = newRpm;
-            emit rpmChanged(m_rpm);
-        }
-    }
-}
-
-void CommunicationManager::handleMqttAccPedalChanged(int newAccPedal)
-{
-    if (m_currentSource == SourceType::Mqtt)
-    {
-        if (m_accPedal != newAccPedal)
-        {
-            m_accPedal = newAccPedal;
-            emit accPedalChanged(m_accPedal);
-        }
-    }
-}
-
-void CommunicationManager::handleMqttBrakePedalChanged(int newBrakePedal)
-{
-    if (m_currentSource == SourceType::Mqtt)
-    {
-        if (m_brakePedal != newBrakePedal)
-        {
-            m_brakePedal = newBrakePedal;
-            emit brakePedalChanged(m_brakePedal);
-        }
-    }
-}
-
-void CommunicationManager::handleMqttEncoderAngleChanged(double newAngle)
-{
-    if (m_currentSource == SourceType::Mqtt)
-    {
-        if (m_encoderAngle != newAngle)
-        {
-            m_encoderAngle = newAngle;
-            emit encoderAngleChanged(m_encoderAngle);
-        }
-    }
-}
-
-void CommunicationManager::handleMqttTemperatureChanged(float newTemperature)
-{
-    if (m_currentSource == SourceType::Mqtt)
-    {
-        if (m_temperature != newTemperature)
-        {
-            m_temperature = newTemperature;
-            emit temperatureChanged(m_temperature);
-        }
-    }
-}
-
-void CommunicationManager::handleMqttBatteryLevelChanged(int newBatteryLevel)
-{
-    if (m_currentSource == SourceType::Mqtt)
-    {
-        if (m_batteryLevel != newBatteryLevel)
-        {
-            m_batteryLevel = newBatteryLevel;
-            emit batteryLevelChanged(m_batteryLevel);
-        }
-    }
-}
-
-void CommunicationManager::handleMqttGpsLongitudeChanged(double newLongitude)
-{
-    if (m_currentSource == SourceType::Mqtt)
-    {
-        if (m_gpsLongitude != newLongitude)
-        {
-            m_gpsLongitude = newLongitude;
-            emit gpsLongitudeChanged(m_gpsLongitude);
-        }
-    }
-}
-
-void CommunicationManager::handleMqttGpsLatitudeChanged(double newGpsLatitude)
-{
-    if (m_currentSource == SourceType::Mqtt)
-    {
-        if (m_gpsLatitude != newGpsLatitude)
-        {
-            m_gpsLatitude = newGpsLatitude;
-            emit gpsLatitudeChanged(m_gpsLatitude);
-        }
-    }
-}
-
-void CommunicationManager::handleMqttSpeedFLChanged(int newSpeedFL)
-{
-    if (m_currentSource == SourceType::Mqtt)
-    {
-        if (m_speedFL != newSpeedFL)
-        {
-            m_speedFL = newSpeedFL;
-            emit speedFLChanged(m_speedFL);
-        }
-    }
-}
-
-void CommunicationManager::handleMqttSpeedFRChanged(int newSpeedFR)
-{
-    if (m_currentSource == SourceType::Mqtt)
-    {
-        if (m_speedFR != newSpeedFR)
-        {
-            m_speedFR = newSpeedFR;
-            emit speedFRChanged(m_speedFR);
-        }
-    }
-}
-
-void CommunicationManager::handleMqttSpeedBLChanged(int newSpeedBL)
-{
-    if (m_currentSource == SourceType::Mqtt)
-    {
-        if (m_speedBL != newSpeedBL)
-        {
-            m_speedBL = newSpeedBL;
-            emit speedBLChanged(m_speedBL);
-        }
-    }
-}
-
-void CommunicationManager::handleMqttSpeedBRChanged(int newSpeedBR)
-{
-    if (m_currentSource == SourceType::Mqtt)
-    {
-        if (m_speedBR != newSpeedBR)
-        {
-            m_speedBR = newSpeedBR;
-            emit speedBRChanged(m_speedBR);
-        }
-    }
-}
-
-void CommunicationManager::handleMqttLateralGChanged(double newLateralG)
-{
-    if (m_currentSource == SourceType::Mqtt)
-    {
-        if (m_lateralG != newLateralG)
-        {
-            m_lateralG = newLateralG;
-            emit lateralGChanged(m_lateralG);
-        }
-    }
-}
-
-void CommunicationManager::handleMqttLongitudinalGChanged(double newLongitudinalG)
-{
-    if (m_currentSource == SourceType::Mqtt)
-    {
-        if (m_longitudinalG != newLongitudinalG)
-        {
-            m_longitudinalG = newLongitudinalG;
-            emit longitudinalGChanged(m_longitudinalG);
-        }
-    }
-}
-
-void CommunicationManager::handleMqttTempFLChanged(int newTempFL)
-{
-    if (m_currentSource == SourceType::Mqtt)
-    {
-        if (m_tempFL != newTempFL)
-        {
-            m_tempFL = newTempFL;
-            emit tempFLChanged(m_tempFL);
-        }
-    }
-}
-
-void CommunicationManager::handleMqttTempFRChanged(int newTempFR)
-{
-    if (m_currentSource == SourceType::Mqtt)
-    {
-        if (m_tempFR != newTempFR)
-        {
-            m_tempFR = newTempFR;
-            emit tempFRChanged(m_tempFR);
-        }
-    }
-}
-
-void CommunicationManager::handleMqttTempBLChanged(int newTempBL)
-{
-    if (m_currentSource == SourceType::Mqtt)
-    {
-        if (m_tempBL != newTempBL)
-        {
-            m_tempBL = newTempBL;
-            emit tempBLChanged(m_tempBL);
-        }
-    }
-}
-
-void CommunicationManager::handleMqttTempBRChanged(int newTempBR)
-{
-    if (m_currentSource == SourceType::Mqtt)
+    if (m_currentSource == source)
     {
         if (m_tempBR != newTempBR)
         {
