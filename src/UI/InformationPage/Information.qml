@@ -35,7 +35,7 @@ Rectangle {
 
 
 
-    /************  Steering Wheel and Proximity Sensor ************/
+    /************  Steering Wheel, Proximity Sensor, Battery, and Pedals ************/
 
     Rectangle {
         id : leftRect
@@ -111,7 +111,7 @@ Rectangle {
                     top: car.top
                     left: proximityRect.left
                     topMargin: 60 * scaleFactor
-                    leftMargin: 8 * scaleFactor
+                    leftMargin: 15 * scaleFactor
                 }
             }
             WheelSpeed {
@@ -123,7 +123,7 @@ Rectangle {
                     top: car.top
                     left: tempFL.right
                     topMargin: 60 * scaleFactor
-                    leftMargin: 6 * scaleFactor  // Increased spacing
+                    leftMargin: 25 * scaleFactor  // Increased spacing
                 }
             }
             
@@ -137,7 +137,7 @@ Rectangle {
                     top: car.top
                     right: tempFR.left
                     topMargin: 60 * scaleFactor
-                    rightMargin: 6 * scaleFactor  // Increased spacing
+                    rightMargin: 25 * scaleFactor  // Increased spacing
                 }
             }
             TireTemperature {
@@ -149,7 +149,7 @@ Rectangle {
                     top: car.top
                     right: proximityRect.right
                     topMargin: 60 * scaleFactor
-                    rightMargin: 8 * scaleFactor
+                    rightMargin: 15 * scaleFactor
                 }
             }
 
@@ -163,7 +163,7 @@ Rectangle {
                     bottom: car.bottom
                     left: proximityRect.left
                     bottomMargin: 60 * scaleFactor
-                    leftMargin: 8 * scaleFactor
+                    leftMargin: 15 * scaleFactor
                 }
             }
             WheelSpeed {
@@ -175,7 +175,7 @@ Rectangle {
                     bottom: car.bottom
                     left: tempBL.right
                     bottomMargin: 60 * scaleFactor
-                    leftMargin: 6 * scaleFactor  // Increased spacing
+                    leftMargin: 25 * scaleFactor  // Increased spacing
                 }
             }
 
@@ -189,7 +189,7 @@ Rectangle {
                     bottom: car.bottom
                     right: tempBR.left
                     bottomMargin: 60 * scaleFactor
-                    rightMargin: 6 * scaleFactor  // Increased spacing
+                    rightMargin: 25 * scaleFactor  // Increased spacing
                 }
             }
             TireTemperature {
@@ -201,7 +201,54 @@ Rectangle {
                     bottom: car.bottom
                     right: proximityRect.right
                     bottomMargin: 60 * scaleFactor
-                    rightMargin: 8 * scaleFactor
+                    rightMargin: 15 * scaleFactor
+                }
+            }
+
+            // Acceleration and Brake Pedals
+            AcceleratorPedal {
+                id: acceleratorPedal
+                scaleFactor: root.scaleFactor
+                pedalPosition:  communicationManager ? communicationManager.accPedal : 0
+                anchors {
+                    bottom: parent.bottom
+                    right: parent.horizontalCenter
+                    margins: 10 * scaleFactor
+                }
+            }
+            BrakePadel {
+                id: brakePedal
+                scaleFactor: root.scaleFactor
+                pedalPosition: communicationManager ? communicationManager.brakePedal : 0
+                anchors {
+                    bottom: parent.bottom
+                    left: parent.horizontalCenter
+                    margins: 10 * scaleFactor
+                }
+            }
+
+            // Temperature and Battery Indicators
+            TemperatureIndicator {
+                id: temperatureIndicator
+                scaleFactor: root.scaleFactor
+                temperature: communicationManager ? communicationManager.temperature : 0
+                anchors {
+                    bottom: parent.bottom
+                    right: parent.right
+                    bottomMargin: 275 * scaleFactor
+                    rightMargin: 85 * scaleFactor
+                }
+            }
+
+            BatteryLevelIndicator {
+                id: batteryLevelIndicator
+                scaleFactor: root.scaleFactor
+                batteryLevel: communicationManager ? communicationManager.batteryLevel : 0
+                anchors {
+                    left: parent.left
+                    bottom: parent.bottom
+                    leftMargin: 32 * scaleFactor
+                    bottomMargin: 185 * scaleFactor
                 }
             }
         }
@@ -256,72 +303,6 @@ Rectangle {
     }
 
 
-    /******** Battery , Accelator , Braker Pedal Readings *************/
-
-    Rectangle {
-        id : pedalTempRect
-        width : parent.width / 5.1
-        height : parent.height / 3.5
-        clip: true  // Prevent content from overflowing
-
-        color: "#09122C"
-        border.color: "#D84040"
-        border.width: 2
-        radius : Math.max(12, 20 * scaleFactor)
-
-        anchors {
-            top : metersScreen.bottom
-            topMargin : 65 * scaleFactor
-            left : leftRect.right
-            leftMargin : 30 * scaleFactor
-        }
-
-        AcceleratorPedal {
-            id: acceleratorPedal
-            scaleFactor: root.scaleFactor
-            pedalPosition:  communicationManager ? communicationManager.accPedal : 0
-            anchors {
-                bottom: parent.bottom
-                left: parent.left
-                margins: 10 * scaleFactor
-            }
-        }
-
-        BrakePadel {
-            id: brakePedal
-            scaleFactor: root.scaleFactor
-            pedalPosition: communicationManager ? communicationManager.brakePedal : 0
-            anchors {
-                bottom: parent.bottom
-                left: acceleratorPedal.right
-                margins: 10 * scaleFactor
-            }
-        }
-
-        TemperatureIndicator {
-            id: temperatureIndicator
-            scaleFactor: root.scaleFactor
-            temperature: communicationManager ? communicationManager.temperature : 0
-            anchors {
-                top: parent.top
-                left: parent.left
-                leftMargin: 10 * scaleFactor
-                topMargin: 20 * scaleFactor
-            }
-        }
-
-        BatteryLevelIndicator {
-            id: batteryLevelIndicator
-            scaleFactor: root.scaleFactor
-            batteryLevel: communicationManager ? communicationManager.batteryLevel : 0
-            anchors {
-                right: parent.right
-                top: parent.top
-                rightMargin: 10 * scaleFactor
-                topMargin: 10 * scaleFactor
-            }
-        }
-    }
     /********************************************************/
 
 
