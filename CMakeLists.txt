@@ -4,7 +4,7 @@ project(GUI VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Quick SerialPort Mqtt)
+find_package(Qt6 REQUIRED COMPONENTS Quick SerialPort Mqtt WebChannel WebEngineQuick)
 
 qt_standard_project_setup(REQUIRES 6.8)
 
@@ -37,7 +37,7 @@ set_target_properties(appGUI PROPERTIES
 )
 
 target_link_libraries(appGUI
-    PRIVATE Qt6::Quick Qt6::SerialPort Qt6::Mqtt
+    PRIVATE Qt6::Quick Qt6::SerialPort Qt6::Mqtt Qt6::WebChannel Qt6::WebEngineQuick
 )
 
 include(GNUInstallDirs)

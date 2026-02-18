@@ -1,5 +1,6 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
+#include <QtWebEngineQuick/QtWebEngineQuick>
 #include <QQmlContext>
 #include <QThread>
 #include <src/Controllers/communication_manager/include/communicationmanager.h>
@@ -9,6 +10,7 @@
 #include <src/Controllers/udp/include/udpclient.h>
 
 int main(int argc, char *argv[]) {
+  QtWebEngineQuick::initialize();
   QGuiApplication app(argc, argv);
 
   // Set application information for QSettings
