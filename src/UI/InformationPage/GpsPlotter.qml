@@ -58,7 +58,7 @@ Rectangle {
         plugin: Plugin {
             name: "googlemaps"
             PluginParameter { name: "googlemaps.useragent"; value: "asurt-telemetry-dashboard" }
-            PluginParameter { name: "googlemaps.cachefolder"; value: "/gmaps_cache" }
+            PluginParameter { name: "googlemaps.cachefolder"; value: "../../../Assets/gmaps_cache" }
             PluginParameter { name: "googlemaps.route.apikey"; value: "INSERT_YOUR_API_KEY" }
             PluginParameter { name: "googlemaps.maps.apikey"; value: "INSERT_YOUR_API_KEY" }
             PluginParameter { name: "googlemaps.geocode.apikey"; value: "INSERT_YOUR_API_KEY" }
