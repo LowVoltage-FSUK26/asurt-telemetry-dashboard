@@ -164,7 +164,7 @@ Item {
                 anchors {
                     bottom: parent.bottom
                     horizontalCenter: parent.horizontalCenter
-                    bottomMargin: 2 * rpmMeter.scaleFactor
+                    bottomMargin: 75 * scaleFactor
                 }
             }
 

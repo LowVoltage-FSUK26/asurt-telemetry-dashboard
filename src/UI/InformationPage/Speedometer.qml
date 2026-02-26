@@ -140,6 +140,7 @@ Item {
                 font.bold: true
                 anchors {
                     bottom: parent.bottom
+                    bottomMargin: 35 * scaleFactor
                     horizontalCenter: parent.horizontalCenter
                 }
             }
