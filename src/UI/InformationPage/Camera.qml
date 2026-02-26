@@ -13,6 +13,9 @@ Rectangle {
     WebEngineView {
         id: webView
         anchors.fill: parent
-        url: "https://en.wikipedia.org/wiki/Humour"
+        url: "qrc:/qt/qml/GUI/Assets/CameraWebPage/index.html"
+        settings.localContentCanAccessRemoteUrls: true
+        settings.localContentCanAccessFileUrls: true
+        settings.allowRunningInsecureContent: true
     }
 }
