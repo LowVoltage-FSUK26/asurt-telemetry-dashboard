@@ -6,6 +6,8 @@ import ssl
 import time
 import threading
 import struct
+import json # To parse the json path
+import threading # To perform automatic simulation
 
 # -----------------------------------------------------------------------------
 # DEFAULT CONFIGURATIONS
@@ -56,10 +58,12 @@ def create_can_packet(can_id, data_bytes):
         
     return payload
 
-def generate_telemetry_packets(norm):
+def generate_telemetry_packets(slider_val):
     """
     Calculates values based on normalized slider (0.0 - 1.0) using correct RANGES.
     """
+    norm = slider_val / 4095.0
+
     packets = []
 
     # --- 1. ADC (0x073) ---
@@ -107,18 +111,27 @@ def generate_telemetry_packets(norm):
     packets.append(create_can_packet(COMM_CAN_ID_IMU_ACCEL, imu_acc_data))
 
     # --- 5. GPS (0x075) ---
-    # Range: Lat 0-180, Lon -180-0 (Updated from source)
-    lat = norm * 180.0
-    lon = -180.0 + (norm * 180.0)
+    # Range: Lat 0-180, Lon -180-0 (Nürburgring Track, cuz why not!)
+    path_file = 'path.json'
+    data = []
+    try:
+        # Open the file and load the data using a 'with' statement for proper file handling
+        with open(path_file, 'r') as file:
+            data = json.load(file)
+    except FileNotFoundError:
+        print(f"Error: The file '{path_file}' was not found.")
+    except json.JSONDecodeError:
+        print(f"Error: Failed to decode JSON from the file.")
+    lat = data[slider_val]['lat']
+    lon = data[slider_val]['lon']
     gps_data = struct.pack("<ff", lon, lat)
     packets.append(create_can_packet(COMM_CAN_ID_GPS_LATLONG, gps_data))
-
+    
     # --- 6. TEMP (0x076) ---
     # Range: 0 to 300 (Updated from source)
     temp = int(norm * 300)
     temp_data = struct.pack("<hhhh", temp, temp, temp, temp)
     packets.append(create_can_packet(COMM_CAN_ID_TEMP, temp_data))
-
     return packets
 
 
@@ -167,6 +180,8 @@ class TelemetryApp:
         self.create_widgets()
         self.toggle_protocol_ui()
         
+        self.automatically_simulating = False
+
         # App is now ready to handle events
         self.initialized = True
 
@@ -219,6 +234,9 @@ class TelemetryApp:
         self.slider.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=10)
         ttk.Label(slider_frame, text="4095").pack(side=tk.RIGHT)
 
+        self.automatic_simulation = ttk.Button(sim_frame, text="Simulate automatically", command = self.toggle_automatic_simulation)
+        self.automatic_simulation.pack(pady=5)
+
         # --- Statistics ---
         stats_frame = ttk.LabelFrame(main_frame, text="Statistics", padding=10)
         stats_frame.pack(fill=tk.X, pady=5)
@@ -255,6 +273,25 @@ class TelemetryApp:
         self.packets_sent = 0
         self.update_stats()
 
+    def toggle_automatic_simulation(self):
+        self.automatically_simulating = not self.automatically_simulating
+        if self.automatically_simulating:
+            self.automatic_simulation.config(text="Stop Simulation")
+            sim_thread = threading.Thread(target=self.simulation_loop, daemon=True)
+            sim_thread.start()
+        else:
+            self.automatic_simulation.config(text="Simulate automatically")
+    def simulation_loop(self):
+        slider_value, inc = 0, 1
+        while self.automatically_simulating:
+            # if (slider_value == 4095 and inc == 1) or (slider_value == 0 and inc == -1):
+                # inc *= -1
+            slider_value += inc
+            slider_value %= 4096
+            self.slider.set(slider_value)
+            #self.on_slider_move(str(slider_value))
+            time.sleep(0.01)
+
     def on_slider_move(self, slider_val_str):
         if not self.initialized: return
         
@@ -266,8 +303,7 @@ class TelemetryApp:
             slider_val = float(slider_val_str)
             self.slider_value_label.config(text=f"ADC Value: {int(slider_val)}")
             
-            norm = slider_val / 4095.0
-            packets = generate_telemetry_packets(norm)
+            packets = generate_telemetry_packets(int(slider_val))
             
             self.data_text.config(state=tk.NORMAL)
             self.data_text.delete("1.0", tk.END)

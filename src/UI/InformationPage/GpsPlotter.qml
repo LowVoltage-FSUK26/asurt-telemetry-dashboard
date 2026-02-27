@@ -32,13 +32,14 @@ Rectangle {
     // Modified function to update path
     function updatePath(lat, lon) {
         var newCoord = QtPositioning.coordinate(lat, lon);
-
+        if (firstCoordinateReceived && (newCoord.latitude === pathCoordinates[pathCoordinates.length - 1].latitude || newCoord.longitude === pathCoordinates[pathCoordinates.length - 1].longitude))
+            return
         if (!firstCoordinateReceived) {
             firstCoordinateReceived = true;
             pathCoordinates = [newCoord];
         } else {
             // Create a new array with all existing coordinates plus the new one
-            var newPath = pathCoordinates.slice(); // Create a copy of the existing array
+            var newPath = pathCoordinates.slice(-15); // Create a copy of the existing array, only leave a bit of the trail.
             newPath.push(newCoord);
             pathCoordinates = newPath; // Assign the new array to trigger update
         }
@@ -49,21 +50,20 @@ Rectangle {
     Map {
         id: map
         anchors.fill: parent
-        zoomLevel: 14
+        zoomLevel: 16
         center: QtPositioning.coordinate(0, 0)
+
+        // Used the third-party plugin (https://github.com/vladest/googlemaps) to integrate Google Maps
+
         plugin: Plugin {
-            name: "osm"
-            PluginParameter {
-                name: "osm.useragent"
-                value: "MyGPSApp"
-            }
-            PluginParameter {
-                name: "osm.mapping.custom.host"
-                value: "https://tile.openstreetmap.org/"
-            }
+            name: "googlemaps"
+            PluginParameter { name: "googlemaps.useragent"; value: "asurt-telemetry-dashboard" }
+            PluginParameter { name: "googlemaps.cachefolder"; value: "../../../Assets/gmaps_cache" }
+            PluginParameter { name: "googlemaps.route.apikey"; value: "INSERT_YOUR_API_KEY" }
+            PluginParameter { name: "googlemaps.maps.apikey"; value: "INSERT_YOUR_API_KEY" }
+            PluginParameter { name: "googlemaps.geocode.apikey"; value: "INSERT_YOUR_API_KEY" }
+            PluginParameter { name: "googlemaps.maps.tilesize"; value: "256" }
         }
-
-
 
         // Modified MapPolyline for better visibility
         MapPolyline {
@@ -99,7 +99,10 @@ Rectangle {
             width: Math.max(18, 20 * scaleFactor)
             height: Math.max(18, 20 * scaleFactor)
             font.pixelSize: Math.max(10, 14 * scaleFactor)
-            onClicked: map.zoomLevel = Math.min(map.zoomLevel + 1, 20)
+            onClicked: {
+                map.zoomLevel = Math.min(map.zoomLevel + 1, 20)
+                map.center = QtPositioning.coordinate(gpsDisplay.currentLatitude, gpsDisplay.currentLongitude)
+            }
         }
         Button {
             text: "-"
