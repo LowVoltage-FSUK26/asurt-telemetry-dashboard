@@ -13,7 +13,7 @@ Rectangle {
     WebEngineView {
         id: webView
         anchors.fill: parent
-        url: "qrc:/qt/qml/GUI/Assets/CameraWebPage/index.html"
+        url: cameraView.state === "fullscreen" ? "qrc:/qt/qml/GUI/Assets/CameraWebPage/full.html" : "qrc:/qt/qml/GUI/Assets/CameraWebPage/index.html"
         settings.localContentCanAccessRemoteUrls: true
         settings.localContentCanAccessFileUrls: true
         settings.allowRunningInsecureContent: true

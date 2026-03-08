@@ -23,8 +23,7 @@ Rectangle {
     border.color: "#A6F1E0"
     border.width: Math.max(3, 5 * scaleFactor)
 
-        /******* Status Bar *********/
-
+    /******* Status Bar *********/
     StatusBar {
         id: statusBar
         scaleFactor: root.scaleFactor
@@ -32,11 +31,7 @@ Rectangle {
         nameOfport : communicationManager.isSerialSource ? root.portName + " (" + root.baudRate + ")" : root.portNumber
    }
 
-
-
-
     /************  Steering Wheel, Proximity Sensor, Battery, and Pedals ************/
-
     Rectangle {
         id : leftRect
         width : parent.width / 3.8  // Slightly wider for better spacing
@@ -76,7 +71,6 @@ Rectangle {
             }
         }
 
-
         Rectangle {
             id : proximityRect
             width : parent.width - 16 * scaleFactor  // More internal space
@@ -84,7 +78,6 @@ Rectangle {
             border.color: "turquoise"
             border.width: 2
             radius: Math.max(12, 20 * scaleFactor)
-
             anchors {
                 horizontalCenter : parent.horizontalCenter
                 top : steeringWheelRect.bottom
@@ -92,7 +85,6 @@ Rectangle {
                 topMargin : 8 * scaleFactor
                 bottomMargin : 8 * scaleFactor
             }
-
             Image {
                 id : car
                 source : "../../../Assets/AI_car_transparent.png"
@@ -126,7 +118,6 @@ Rectangle {
                     leftMargin: 25 * scaleFactor  // Increased spacing
                 }
             }
-            
             // Front Right - Wheel Speed then Temperature
             WheelSpeed {
                 id: fr
@@ -152,7 +143,6 @@ Rectangle {
                     rightMargin: 15 * scaleFactor
                 }
             }
-
             // Back Left - Temperature then Wheel Speed
             TireTemperature {
                 id: tempBL
@@ -178,7 +168,6 @@ Rectangle {
                     leftMargin: 25 * scaleFactor  // Increased spacing
                 }
             }
-
             // Back Right - Wheel Speed then Temperature
             WheelSpeed {
                 id: br
@@ -204,7 +193,6 @@ Rectangle {
                     rightMargin: 15 * scaleFactor
                 }
             }
-
             // Acceleration and Brake Pedals
             AcceleratorPedal {
                 id: acceleratorPedal
@@ -226,7 +214,6 @@ Rectangle {
                     margins: 10 * scaleFactor
                 }
             }
-
             // Temperature and Battery Indicators
             TemperatureIndicator {
                 id: temperatureIndicator
@@ -239,7 +226,6 @@ Rectangle {
                     rightMargin: 85 * scaleFactor
                 }
             }
-
             BatteryLevelIndicator {
                 id: batteryLevelIndicator
                 scaleFactor: root.scaleFactor
@@ -254,48 +240,113 @@ Rectangle {
         }
     }
 
-    /********************************************************/
-
     /************  GPS, Camera ************/
-
     Rectangle {
         id: gpsView
         color: "#09122C"
         border.color: "#D84040"
         border.width: 2
         radius: Math.max(12, 20 * scaleFactor)
+        width: parent.width * 1.7 / 3.8
         anchors {
             top : statusBar.bottom
-            margins: 8 * scaleFactor
-            left: leftRect.right
-            right: metersScreen.left
+            margins: 5 * scaleFactor
             bottom: metersScreen.verticalCenter
+            horizontalCenter: parent.horizontalCenter
         }
-
+        states: [
+            State {
+                name: "fullscreen"
+                AnchorChanges {
+                    target: gpsView
+                    anchors.top: statusBar.bottom
+                    anchors.bottom: parent.bottom
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.horizontalCenter: undefined
+                }
+                PropertyChanges {
+                    target: gpsView
+                    z: 1
+                    width: undefined
+                    anchors.topMargin: 5 * scaleFactor
+                    anchors.bottomMargin: 10 * scaleFactor
+                    anchors.leftMargin: 10 * scaleFactor
+                    anchors.rightMargin: 10 * scaleFactor
+                }
+            },
+            State {
+                name: "default"
+                AnchorChanges {
+                    target: gpsView
+                    anchors.top : statusBar.bottom
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.bottom: metersScreen.verticalCenter
+                }
+                PropertyChanges {
+                    target: gpsView
+                    width: parent.width * 1.7 / 3.8
+                    anchors.margins: 5 * scaleFactor
+                    z: 0
+                }
+            }
+        ]
+        transitions: [
+            Transition {
+                to: "fullscreen"
+                SequentialAnimation {
+                    NumberAnimation { target: gps; property: "opacity"; to: 0; duration: 75 }
+                    PropertyAction { target: gpsView; property: "z" }
+                    AnchorAnimation {
+                        duration: 400
+                        easing.type: Easing.InOutQuad
+                    }
+                    NumberAnimation { target: gps; property: "opacity"; to: 1; duration: 150 }
+                }
+            },
+            Transition {
+                to: "default"
+                SequentialAnimation {
+                    NumberAnimation { target: gps; property: "opacity"; to: 0; duration: 75 }
+                    AnchorAnimation {
+                        duration: 400
+                        easing.type: Easing.InOutQuad
+                        }
+                    PropertyAction { target: gpsView; property: "z" }
+                    NumberAnimation { target: gps; property: "opacity"; to: 1; duration: 150 }
+                }
+            }
+        ]
         Text {
             id : gpsText
             text : "GPS"
             color : "turquoise"
+            width : parent.width
+            horizontalAlignment : Text.AlignHCenter
             font {
                 pixelSize: Math.max(14, 20 * scaleFactor)
                 family: "DS-Digital"
             }
-
             anchors {
                 top : parent.top
                 horizontalCenter : parent.horizontalCenter
-                topMargin : 5 * scaleFactor
+                topMargin : 2.5 * scaleFactor
+            }
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    gpsView.state = (gpsView.state === "fullscreen" ? "default" : "fullscreen")
+                }
             }
         }
-
         GpsPlotter {
             id : gps
             scaleFactor: root.scaleFactor
             anchors {
                 horizontalCenter : parent.horizontalCenter
-                top : parent.top
+                top : gpsText.bottom
                 bottom : parent.bottom
-                topMargin : 30 * scaleFactor
+                topMargin : 2.5 * scaleFactor
                 bottomMargin : 15 * scaleFactor
             }
         }
@@ -307,27 +358,101 @@ Rectangle {
         border.color: "#D84040"
         border.width: 2
         radius: Math.max(12, 20 * scaleFactor)
+        width: parent.width * 1.7 / 3.8
+        clip: true
         anchors {
-            top : gpsView.bottom
-            margins: 8 * scaleFactor
-            left: leftRect.right
-            right: metersScreen.left
+            top : metersScreen.verticalCenter
+            horizontalCenter: parent.horizontalCenter
             bottom: parent.bottom
+            margins: 5 * scaleFactor
+            bottomMargin: 10 * scaleFactor
         }
-
+        states: [
+            State {
+                name: "fullscreen"
+                AnchorChanges {
+                    target: cameraView
+                    anchors.top: parent.top
+                    anchors.bottom: parent.bottom
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.horizontalCenter: undefined
+                }
+                PropertyChanges {
+                    target: cameraView
+                    z: 1
+                    width: undefined
+                    anchors.topMargin: 37.5 * scaleFactor
+                    anchors.rightMargin: 10 * scaleFactor
+                    anchors.leftMargin: 10 * scaleFactor
+                }
+            },
+            State {
+                name: "default"
+                AnchorChanges {
+                    target: cameraView
+                    anchors.top : metersScreen.verticalCenter
+                    anchors.left: undefined
+                    anchors.right: undefined
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.bottom: parent.bottom
+                }
+                PropertyChanges {
+                    target: cameraView
+                    anchors.topMargin: 5 * scaleFactor
+                    anchors.rightMargin: 5 * scaleFactor
+                    anchors.leftMargin: 5 * scaleFactor
+                    width: parent.width * 1.7 / 3.8
+                    z: 0
+                }
+            }
+        ]
+        transitions: [
+            Transition {
+                to: "fullscreen"
+                SequentialAnimation {
+                    NumberAnimation { target: camera; property: "opacity"; to: 0; duration: 75 }
+                    PropertyAction { target: cameraView; property: "z" }
+                    AnchorAnimation {
+                        duration: 400
+                        easing.type: Easing.InOutQuad
+                    }
+                    NumberAnimation { target: camera; property: "opacity"; to: 1; duration: 150 }
+                }
+            },
+            Transition {
+                to: "default"
+                SequentialAnimation {
+                    NumberAnimation { target: camera; property: "opacity"; to: 0; duration: 75 }
+                    AnchorAnimation {
+                        duration: 400
+                        easing.type: Easing.InOutQuad
+                        }
+                    PropertyAction { target: cameraView; property: "z" }
+                    NumberAnimation { target: camera; property: "opacity"; to: 1; duration: 150 }
+                }
+            }
+        ]
         Text {
             id : cameraText
             text : "Camera"
             color : "turquoise"
+            width : parent.width
+            horizontalAlignment : Text.AlignHCenter
             font {
                 pixelSize: Math.max(14, 20 * scaleFactor)
                 family: "DS-Digital"
             }
-
             anchors {
                 top : parent.top
                 horizontalCenter : parent.horizontalCenter
-                topMargin : 5 * scaleFactor
+                topMargin : 2.5 * scaleFactor
+            }
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    cameraView.state = (cameraView.state === "fullscreen" ? "default" : "fullscreen")
+                }
             }
         }
 
@@ -335,11 +460,15 @@ Rectangle {
             id : camera
             scaleFactor: root.scaleFactor
             anchors {
-                horizontalCenter : parent.horizontalCenter
-                top : parent.top
+                // horizontalCenter : parent.horizontalCenter
+                top : cameraText.bottom
                 bottom : parent.bottom
-                topMargin : 30 * scaleFactor
+                right : parent.right
+                left : parent.left
+                topMargin : 2.5 * scaleFactor
                 bottomMargin : 15 * scaleFactor
+                rightMargin: 15 * scaleFactor
+                leftMargin: 15 * scaleFactor
             }
         }
     }
@@ -348,7 +477,7 @@ Rectangle {
 
     Rectangle {
         id : metersScreen
-        width : parent.width / 4.2  // Symmetrical with leftRect
+        width : parent.width / 3.8  // Symmetrical with leftRect
         color : "#09122C"
         radius : Math.max(20, 30 * scaleFactor)
         border.width : 2
@@ -363,6 +492,63 @@ Rectangle {
             bottomMargin : 10 * scaleFactor
         }
 
+        states: [
+            State {
+                name: "fullscreen"
+                AnchorChanges {
+                    target: metersScreen
+                    anchors.top: parent.top
+                    anchors.bottom: parent.bottom
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                }
+                PropertyChanges {
+                    target: metersScreen
+                    z: 1
+                    anchors.topMargin: 37.5 * scaleFactor
+                    anchors.leftMargin : 10 * scaleFactor
+                }
+            },
+            State {
+                name: "default"
+                AnchorChanges {
+                    target: metersScreen
+                    anchors.top : statusBar.bottom
+                    anchors.right: parent.right
+                    anchors.bottom : parent.bottom
+                }
+                PropertyChanges {
+                    target: metersScreen
+                    width: parent.width / 3.8
+                    anchors.topMargin : 5 * scaleFactor
+                    anchors.leftMargin : 0
+                    z: 0
+                }
+            }
+        ]
+        transitions: [
+            Transition {
+                to: "fullscreen"
+                SequentialAnimation {
+                    PropertyAction { target: metersScreen; property: "z" }
+                    AnchorAnimation {
+                        duration: 400
+                        easing.type: Easing.InOutQuad
+                    }
+                    NumberAnimation { target: metersScreen; property: "opacity"; to: 1; duration: 150 }
+                }
+            },
+            Transition {
+                to: "default"
+                SequentialAnimation {
+                    AnchorAnimation {
+                        duration: 400
+                        easing.type: Easing.InOutQuad
+                        }
+                    PropertyAction { target: metersScreen; property: "z" }
+                }
+            }
+        ]
         Text {
             id : metersText
             text : "Meters"
@@ -371,11 +557,18 @@ Rectangle {
                 pixelSize: Math.max(14, 20 * scaleFactor)
                 family: "DS-Digital"
             }
-
+            width : parent.width
+            horizontalAlignment : Text.AlignHCenter
             anchors {
                 top : parent.top
                 horizontalCenter : parent.horizontalCenter
                 topMargin : 5 * scaleFactor
+            }
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    metersScreen.state = (metersScreen.state === "fullscreen" ? "default" : "fullscreen")
+                }
             }
         }
 
