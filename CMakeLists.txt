@@ -4,7 +4,7 @@ project(GUI VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Quick SerialPort Mqtt WebChannel WebEngineQuick)
+find_package(Qt6 REQUIRED COMPONENTS Quick SerialPort Mqtt WebChannel WebEngineQuick Graphs)
 
 qt_standard_project_setup(REQUIRES 6.8)
 
@@ -23,6 +23,7 @@ qt_add_qml_module(appGUI
         SOURCES src/Controllers/communication_manager/src/communicationmanager.cpp src/Controllers/communication_manager/include/communicationmanager.h src/Controllers/mqtt/src/mqttclient.cpp src/Controllers/mqtt/include/mqttclient.h src/Controllers/mqtt/src/mqttparserworker.cpp src/Controllers/mqtt/include/mqttparserworker.h src/Controllers/mqtt/src/mqttreceiverworker.cpp src/Controllers/mqtt/include/mqttreceiverworker.h src/Controllers/serial/src/serialmanager.cpp src/Controllers/serial/include/serialmanager.h src/Controllers/serial/src/serialparserworker.cpp src/Controllers/serial/include/serialparserworker.h src/Controllers/serial/src/serialreceiverworker.cpp src/Controllers/serial/include/serialreceiverworker.h src/Controllers/udp/src/udpclient.cpp src/Controllers/udp/include/udpclient.h src/Controllers/udp/src/udpparserworker.cpp src/Controllers/udp/include/udpparserworker.h src/Controllers/udp/src/udpreceiverworker.cpp src/Controllers/udp/include/udpreceiverworker.h src/Controllers/can/src/candecoder.cpp src/Controllers/can/include/candecoder.h src/Controllers/logging/src/asynclogger.cpp src/Controllers/logging/include/asynclogger.h
         QML_FILES src/UI/StatusBar/StatusBar.qml
         QML_FILES src/UI/InformationPage/Camera.qml
+        QML_FILES src/UI/InformationPage/Graphs/LineGraph.qml
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
@@ -37,7 +38,7 @@ set_target_properties(appGUI PROPERTIES
 )
 
 target_link_libraries(appGUI
-    PRIVATE Qt6::Quick Qt6::SerialPort Qt6::Mqtt Qt6::WebChannel Qt6::WebEngineQuick
+    PRIVATE Qt6::Quick Qt6::SerialPort Qt6::Mqtt Qt6::WebChannel Qt6::WebEngineQuick Qt6::Graphs
 )
 
 include(GNUInstallDirs)

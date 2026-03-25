@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Shapes
 import "../StatusBar"
+import "Graphs"
 
 Rectangle {
     id: root
@@ -535,7 +536,6 @@ Rectangle {
                         duration: 400
                         easing.type: Easing.InOutQuad
                     }
-                    NumberAnimation { target: metersScreen; property: "opacity"; to: 1; duration: 150 }
                 }
             },
             Transition {
@@ -576,11 +576,73 @@ Rectangle {
             id: speedometer
             scaleFactor: 0.85 * root.scaleFactor
             speed: communicationManager ? communicationManager.speed : 0
+            state: metersScreen.state
+            states: [
+                State {
+                    name: "default"
+                    AnchorChanges {
+                        target: speedometer
+                        anchors {
+                            horizontalCenter: parent.horizontalCenter
+                            top: parent.top
+                        }
+                    }
+                    PropertyChanges {
+                        target: speedometer
+                        scaleFactor: 0.85 * root.scaleFactor
+                        anchors.topMargin: -40 * scaleFactor
+                    }
+                },
+                State {
+                    name: "fullscreen"
+                    AnchorChanges {
+                        target: speedometer
+                        anchors {
+                            horizontalCenter: parent.left
+                            top: parent.top
+                        }
+                    }
+                    PropertyChanges {
+                        target: speedometer
+                        scaleFactor: 1.15 * root.scaleFactor
+                        anchors.topMargin: -40 * scaleFactor
+                        anchors.horizontalCenterOffset: parent.width / 4
+                    }
+                }
+            ]
+            anchors { horizontalCenter: parent.horizontalCenter; top: parent.top; topMargin: -40 * scaleFactor }
+        }
+
+        LineGraph {
+            id: speedGraph
+            scaleFactor: root.scaleFactor
+            graphVariable: communicationManager ? communicationManager.speed : 0
+            width: speedometer.width
+            height: 350 * scaleFactor
+            visible: false
+            z: 2
             anchors {
-                horizontalCenter: parent.horizontalCenter
-                top: parent.top
-                topMargin: -40 * scaleFactor
+                horizontalCenter: speedometer.horizontalCenter
+                verticalCenter: parent.bottom
+                verticalCenterOffset: - parent.height / 4
             }
+            state: metersScreen.state
+            states: [
+                State {
+                    name: "default"
+                    PropertyChanges {
+                        target: speedGraph
+                        visible: false
+                    }
+                },
+                State {
+                    name: "fullscreen"
+                    PropertyChanges {
+                        target: speedGraph
+                        visible: true
+                    }
+                }
+            ]
         }
 
         RpmMeter {
@@ -592,6 +654,73 @@ Rectangle {
                 horizontalCenter: parent.horizontalCenter
                 topMargin: -150 * scaleFactor
             }
+            state: metersScreen.state
+            states: [
+                State {
+                    name: "default"
+                    AnchorChanges {
+                        target: rpmMeter
+                        anchors {
+                            top: speedometer.bottom
+                            verticalCenter: undefined
+                        }
+                    }
+                    PropertyChanges {
+                        target: rpmMeter
+                        scaleFactor: root.scaleFactor
+                        anchors.topMargin: -150 * scaleFactor
+                        anchors.horizontalCenterOffset: 0
+                    }
+                },
+                State {
+                    name: "fullscreen"
+                    AnchorChanges {
+                        target: rpmMeter
+                        anchors {
+                            top: undefined
+                            verticalCenter: speedometer.verticalCenter
+                        }
+                    }
+                    PropertyChanges {
+                        target: rpmMeter
+                        scaleFactor: 1.3 * root.scaleFactor
+                        anchors.topMargin: undefined
+                        anchors.horizontalCenterOffset: parent.width / 4
+                    }
+                }
+            ]
+        }
+
+        LineGraph {
+            id: rpmGraph
+            scaleFactor: root.scaleFactor
+            graphVariable: communicationManager ? communicationManager.rpm : 0
+            width: rpmMeter.width
+            height: 350 * scaleFactor
+            visible: false
+            z: 2
+            anchors {
+                horizontalCenter: rpmMeter.horizontalCenter
+                verticalCenter: parent.bottom
+                verticalCenterOffset: - parent.height / 4
+            }
+            state: metersScreen.state
+            states: [
+                State {
+                    name: "default"
+                    PropertyChanges {
+                        target: rpmGraph
+                        visible: false
+                    }
+                },
+                State {
+                    name: "fullscreen"
+                    PropertyChanges {
+                        target: rpmGraph
+                        visible: true
+                    }
+                }
+            ]
         }
 
         Rectangle {
@@ -609,6 +738,24 @@ Rectangle {
                 bottom: parent.bottom
                 bottomMargin: 15 * scaleFactor
             }
+
+            state: metersScreen.state
+            states: [
+                State {
+                    name: "default"
+                    PropertyChanges {
+                        target: bottomRect
+                        visible: true
+                    }
+                },
+                State {
+                    name: "fullscreen"
+                    PropertyChanges {
+                        target: bottomRect
+                        visible: false
+                    }
+                }
+            ]
 
             // Calculate diagram size based on available space
             property real diagramSize: Math.min(width * 0.85, height * 0.75, 294 * scaleFactor)
