@@ -50,7 +50,7 @@ Rectangle {
     Map {
         id: map
         anchors.fill: parent
-        zoomLevel: 16
+        zoomLevel: 14
         center: QtPositioning.coordinate(0, 0)
 
         // Used the third-party plugin (https://github.com/vladest/googlemaps) to integrate Google Maps

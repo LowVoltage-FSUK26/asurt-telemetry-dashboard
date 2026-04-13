@@ -6,8 +6,7 @@ import ssl
 import time
 import threading
 import struct
-import json # To parse the json path
-import threading # To perform automatic simulation
+import json 
 
 # -----------------------------------------------------------------------------
 # DEFAULT CONFIGURATIONS
@@ -58,83 +57,6 @@ def create_can_packet(can_id, data_bytes):
         
     return payload
 
-def generate_telemetry_packets(slider_val):
-    """
-    Calculates values based on normalized slider (0.0 - 1.0) using correct RANGES.
-    """
-    norm = slider_val / 4095.0
-
-    packets = []
-
-    # --- 1. ADC (0x073) ---
-    # Range: 0-1023 (10 bits)
-    val_10b = int(norm * 1023) & 0x3FF
-    adc_raw = (
-        (val_10b) | 
-        (val_10b << 10) | 
-        (val_10b << 20) | 
-        (val_10b << 30) | 
-        (val_10b << 40) | 
-        (val_10b << 50)
-    )
-    packets.append(create_can_packet(COMM_CAN_ID_ADC, struct.pack("<Q", adc_raw)))
-
-    # --- 2. PROX_ENCODER (0x074) ---
-    # Range: 0-2000 (Updated from source)
-    rpm = int(norm * 2000) & 0x7FF
-    enc = int(norm * 1023) & 0x3FF
-    spd = int(norm * 200) & 0xFF 
-
-    prox_raw = (
-        (rpm) |
-        (rpm << 11) |
-        (rpm << 22) |
-        (rpm << 33) |
-        (enc << 44) |
-        (spd << 54)
-    )
-    packets.append(create_can_packet(COMM_CAN_ID_PROX_ENCODER, struct.pack("<Q", prox_raw)))
-
-    # --- 3. IMU ANGLE (0x071) ---
-    # Range: -180 to 180 (X/Z), -90 to 90 (Y) (Updated from source)
-    ang_x = int(-180 + norm * 360)
-    ang_y = int(-90 + norm * 180)
-    ang_z = int(-180 + norm * 360)
-    
-    imu_ang_data = struct.pack("<hhh", ang_x, ang_y, ang_z)
-    packets.append(create_can_packet(COMM_CAN_ID_IMU_ANGLE, imu_ang_data))
-
-    # --- 4. IMU ACCEL (0x072) ---
-    # Range: 0 to 16 (Updated from source)
-    accel = int(norm * 16)
-    imu_acc_data = struct.pack("<hhh", accel, accel, accel)
-    packets.append(create_can_packet(COMM_CAN_ID_IMU_ACCEL, imu_acc_data))
-
-    # --- 5. GPS (0x075) ---
-    # Range: Lat 0-180, Lon -180-0 (Nürburgring Track, cuz why not!)
-    path_file = 'path.json'
-    data = []
-    try:
-        # Open the file and load the data using a 'with' statement for proper file handling
-        with open(path_file, 'r') as file:
-            data = json.load(file)
-    except FileNotFoundError:
-        print(f"Error: The file '{path_file}' was not found.")
-    except json.JSONDecodeError:
-        print(f"Error: Failed to decode JSON from the file.")
-    lat = data[slider_val]['lat']
-    lon = data[slider_val]['lon']
-    gps_data = struct.pack("<ff", lon, lat)
-    packets.append(create_can_packet(COMM_CAN_ID_GPS_LATLONG, gps_data))
-    
-    # --- 6. TEMP (0x076) ---
-    # Range: 0 to 300 (Updated from source)
-    temp = int(norm * 300)
-    temp_data = struct.pack("<hhhh", temp, temp, temp, temp)
-    packets.append(create_can_packet(COMM_CAN_ID_TEMP, temp_data))
-    return packets
-
-
 # -----------------------------------------------------------------------------
 # GUI APPLICATION
 # -----------------------------------------------------------------------------
@@ -142,9 +64,9 @@ def generate_telemetry_packets(slider_val):
 class TelemetryApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("ESP32 Telemetry Simulator (Fixed)")
+        self.root.title("ESP32 Telemetry Simulator")
         self.root.geometry("550x750")
-        self.initialized = False  # PREVENTS CRASH ON STARTUP
+        self.initialized = False  
 
         self.mqtt_client = None
         self.mqtt_connected = False
@@ -157,6 +79,14 @@ class TelemetryApp:
         # Statistics
         self.packets_sent = 0
         self.last_packet_time = None
+
+        # FIX 5: Load JSON data into memory ONCE during startup, not 20 times a second.
+        self.path_data = []
+        try:
+            with open('path.json', 'r') as file:
+                self.path_data = json.load(file)
+        except Exception as e:
+            print(f"Warning: Could not load path.json - {e}")
 
         # --- TKinter Variables ---
         self.protocol_var = tk.StringVar(value="MQTT")
@@ -182,75 +112,57 @@ class TelemetryApp:
         
         self.automatically_simulating = False
 
-        # App is now ready to handle events
         self.initialized = True
 
     def create_widgets(self):
         main_frame = ttk.Frame(self.root, padding=10)
         main_frame.pack(fill=tk.BOTH, expand=True)
 
-        # --- Protocol Selection ---
         proto_frame = ttk.LabelFrame(main_frame, text="1. Select Protocol", padding=10)
         proto_frame.pack(fill=tk.X, pady=5)
-        
-        ttk.Radiobutton(proto_frame, text="MQTT (Secure)", variable=self.protocol_var, value="MQTT", command=self.toggle_protocol_ui).pack(side=tk.LEFT, padx=10)
+        ttk.Radiobutton(proto_frame, text="MQTT", variable=self.protocol_var, value="MQTT", command=self.toggle_protocol_ui).pack(side=tk.LEFT, padx=10)
         ttk.Radiobutton(proto_frame, text="UDP", variable=self.protocol_var, value="UDP", command=self.toggle_protocol_ui).pack(side=tk.LEFT, padx=10)
 
-        # --- MQTT Configuration ---
         self.mqtt_frame = ttk.LabelFrame(main_frame, text="2. MQTT Configuration", padding=10)
         self.mqtt_frame.pack(fill=tk.X, pady=5)
-        
         self.mqtt_entries.append(self.create_entry(self.mqtt_frame, "Broker:", self.mqtt_broker_var))
         self.mqtt_entries.append(self.create_entry(self.mqtt_frame, "Port:", self.mqtt_port_var))
         self.mqtt_entries.append(self.create_entry(self.mqtt_frame, "Username:", self.mqtt_user_var))
         self.mqtt_entries.append(self.create_entry(self.mqtt_frame, "Password:", self.mqtt_pass_var, show="*"))
         self.mqtt_entries.append(self.create_entry(self.mqtt_frame, "Topic:", self.mqtt_topic_var))
-        
         self.mqtt_connect_button = ttk.Button(self.mqtt_frame, text="Connect", command=self.toggle_mqtt_connection)
         self.mqtt_connect_button.pack(pady=5)
         self.mqtt_entries.append(self.mqtt_connect_button)
-        
         ttk.Label(self.mqtt_frame, textvariable=self.mqtt_status_var, font=("Arial", 10, "italic")).pack(pady=5)
 
-        # --- UDP Configuration ---
         self.udp_frame = ttk.LabelFrame(main_frame, text="2. UDP Configuration", padding=10)
         self.udp_frame.pack(fill=tk.X, pady=5)
-
         self.udp_entries.append(self.create_entry(self.udp_frame, "Server IP:", self.udp_ip_var))
         self.udp_entries.append(self.create_entry(self.udp_frame, "Server Port:", self.udp_port_var))
 
-        # --- Simulator Control ---
         sim_frame = ttk.LabelFrame(main_frame, text="3. Simulator Control (ADC Value: 0-4095)", padding=10)
         sim_frame.pack(fill=tk.X, pady=10)
-
         self.slider_value_label = ttk.Label(sim_frame, text="ADC Value: 0", font=("Arial", 10, "bold"))
         self.slider_value_label.pack(pady=5)
-
         slider_frame = ttk.Frame(sim_frame)
         slider_frame.pack(fill=tk.X, padx=10, pady=5)
-
         ttk.Label(slider_frame, text="0").pack(side=tk.LEFT)
         self.slider = ttk.Scale(slider_frame, from_=0, to=4095, orient=tk.HORIZONTAL, command=self.on_slider_move)
         self.slider.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=10)
         ttk.Label(slider_frame, text="4095").pack(side=tk.RIGHT)
-
-        self.automatic_simulation = ttk.Button(sim_frame, text="Simulate automatically", command = self.toggle_automatic_simulation)
+        self.automatic_simulation = ttk.Button(sim_frame, text="Simulate automatically", command=self.toggle_automatic_simulation)
         self.automatic_simulation.pack(pady=5)
 
-        # --- Statistics ---
         stats_frame = ttk.LabelFrame(main_frame, text="Statistics", padding=10)
         stats_frame.pack(fill=tk.X, pady=5)
         ttk.Label(stats_frame, textvariable=self.stats_var, font=("Arial", 9)).pack()
 
-        # --- Data Display ---
         data_frame = ttk.LabelFrame(main_frame, text="Sent Data Hex (Last Batch)", padding=10)
         data_frame.pack(fill=tk.BOTH, expand=True, pady=5)
-        
         self.data_text = tk.Text(data_frame, height=8, wrap=tk.WORD, font=("Courier", 9))
         self.data_text.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
         self.data_text.insert("1.0", "Move slider to send data...")
         self.data_text.config(state=tk.DISABLED)
-
         self.slider.set(0)
 
     def create_entry(self, parent, label_text, var, show=None):
@@ -269,7 +181,6 @@ class TelemetryApp:
             for widget in self.mqtt_entries: widget.config(state='disabled')
             for widget in self.udp_entries: widget.config(state='normal')
             if self.mqtt_connected: self.disconnect_mqtt()
-
         self.packets_sent = 0
         self.update_stats()
 
@@ -281,20 +192,55 @@ class TelemetryApp:
             sim_thread.start()
         else:
             self.automatic_simulation.config(text="Simulate automatically")
+
     def simulation_loop(self):
         slider_value, inc = 0, 1
         while self.automatically_simulating:
-            # if (slider_value == 4095 and inc == 1) or (slider_value == 0 and inc == -1):
-                # inc *= -1
             slider_value += inc
             slider_value %= 4096
-            self.slider.set(slider_value)
-            #self.on_slider_move(str(slider_value))
+            # FIX 3: Safe UI update from background thread to prevent crashing
+            self.root.after(0, self.slider.set, slider_value)
             time.sleep(0.01)
+
+    def generate_telemetry_packets(self, slider_val):
+        norm = slider_val / 4095.0
+        packets = []
+
+        # 1. ADC
+        val_10b = int(norm * 1023) & 0x3FF
+        adc_raw = (val_10b) | (val_10b << 10) | (val_10b << 20) | (val_10b << 30) | (val_10b << 40) | (val_10b << 50)
+        packets.append(create_can_packet(COMM_CAN_ID_ADC, struct.pack("<Q", adc_raw)))
+
+        # 2. PROX_ENCODER
+        rpm = int(norm * 2000) & 0x7FF
+        enc = int(norm * 1023) & 0x3FF
+        spd = int(norm * 200) & 0xFF 
+        prox_raw = (rpm) | (rpm << 11) | (rpm << 22) | (rpm << 33) | (enc << 44) | (spd << 54)
+        packets.append(create_can_packet(COMM_CAN_ID_PROX_ENCODER, struct.pack("<Q", prox_raw)))
+
+        # 3. IMU ANGLE
+        ang_x, ang_y, ang_z = int(-180 + norm * 360), int(-90 + norm * 180), int(-180 + norm * 360)
+        packets.append(create_can_packet(COMM_CAN_ID_IMU_ANGLE, struct.pack("<hhh", ang_x, ang_y, ang_z)))
+
+        # 4. IMU ACCEL
+        accel = int(norm * 16)
+        packets.append(create_can_packet(COMM_CAN_ID_IMU_ACCEL, struct.pack("<hhh", accel, accel, accel)))
+
+        # 5. GPS (Safely fetching from memory array)
+        lat, lon = 0.0, 0.0
+        if self.path_data and int(slider_val) < len(self.path_data):
+            lat = self.path_data[int(slider_val)].get('lat', 0.0)
+            lon = self.path_data[int(slider_val)].get('lon', 0.0)
+        packets.append(create_can_packet(COMM_CAN_ID_GPS_LATLONG, struct.pack("<ff", lon, lat)))
+        
+        # 6. TEMP
+        temp = int(norm * 300)
+        packets.append(create_can_packet(COMM_CAN_ID_TEMP, struct.pack("<hhhh", temp, temp, temp, temp)))
+        
+        return packets
 
     def on_slider_move(self, slider_val_str):
         if not self.initialized: return
-        
         current_time = time.time()
         if current_time - self.last_send_time < self.send_interval: return
         self.last_send_time = current_time
@@ -303,7 +249,7 @@ class TelemetryApp:
             slider_val = float(slider_val_str)
             self.slider_value_label.config(text=f"ADC Value: {int(slider_val)}")
             
-            packets = generate_telemetry_packets(int(slider_val))
+            packets = self.generate_telemetry_packets(int(slider_val))
             
             self.data_text.config(state=tk.NORMAL)
             self.data_text.delete("1.0", tk.END)
@@ -315,12 +261,10 @@ class TelemetryApp:
                 can_id = struct.unpack_from("<L", pkt, 4)[0]
                 display_str += f"ID 0x{can_id:03X}: {pkt.hex().upper()}\n"
 
-                sent = False
                 if self.protocol_var.get() == "MQTT":
-                    sent = self.send_mqtt(pkt)
+                    if self.send_mqtt(pkt): success_count += 1
                 else:
-                    sent = self.send_udp(pkt)
-                if sent: success_count += 1
+                    if self.send_udp(pkt): success_count += 1
 
             self.data_text.insert("1.0", display_str)
             self.data_text.config(state=tk.DISABLED)
@@ -340,9 +284,7 @@ class TelemetryApp:
             self.stats_var.set(f"Frames sent: {self.packets_sent}")
 
     def send_mqtt(self, message_bytes):
-        if not self.mqtt_connected:
-            self.mqtt_status_var.set("Disconnected - Connect first")
-            return False
+        if not self.mqtt_connected: return False
         try:
             self.mqtt_client.publish(self.mqtt_topic_var.get(), message_bytes, qos=0)
             return True
@@ -357,7 +299,6 @@ class TelemetryApp:
         except Exception:
             return False
 
-    # --- MQTT Connection ---
     def toggle_mqtt_connection(self):
         if self.mqtt_connected: self.disconnect_mqtt()
         else: self.connect_mqtt()
@@ -366,11 +307,20 @@ class TelemetryApp:
         try:
             broker = self.mqtt_broker_var.get()
             port = int(self.mqtt_port_var.get())
+            user = self.mqtt_user_var.get().strip()
+            pwd = self.mqtt_pass_var.get().strip()
+
             self.mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
             self.mqtt_client.on_connect = self.on_mqtt_connect
             self.mqtt_client.on_disconnect = self.on_mqtt_disconnect
-            self.mqtt_client.username_pw_set(self.mqtt_user_var.get(), self.mqtt_pass_var.get())
-            self.mqtt_client.tls_set(cert_reqs=ssl.CERT_REQUIRED, tls_version=ssl.PROTOCOL_TLS)
+            
+            # FIX 1: Only send username packet if fields are not empty (Fixes Error 104)
+            if user or pwd:
+                self.mqtt_client.username_pw_set(user, pwd)
+            
+            # FIX 2: Smart SSL. Only activate TLS if using port 8883/8884 (Fixes Error 111)
+            if port in [8883, 8884]:
+                self.mqtt_client.tls_set(cert_reqs=ssl.CERT_REQUIRED, tls_version=ssl.PROTOCOL_TLS)
             
             self.mqtt_status_var.set(f"Connecting to {broker}...")
             self.mqtt_connect_button.config(state="disabled")
@@ -396,24 +346,24 @@ class TelemetryApp:
             self.mqtt_status_var.set("Disconnected")
             self.mqtt_connect_button.config(text="Connect", state="normal")
 
-    def on_mqtt_connect(self, client, userdata, flags, rc, properties=None):
-        if rc == 0:
+    # FIX 4: Updated Paho V2 callbacks to use reason_code and proper flags
+    def on_mqtt_connect(self, client, userdata, flags, reason_code, properties=None):
+        if reason_code == 0:
             self.mqtt_connected = True
             self.root.after(0, lambda: self.update_mqtt_ui("Connected", "Disconnect", "normal"))
         else:
             self.mqtt_connected = False
-            self.root.after(0, lambda: self.update_mqtt_ui(f"Failed {rc}", "Connect", "normal"))
+            self.root.after(0, lambda: self.update_mqtt_ui(f"Failed ({reason_code})", "Connect", "normal"))
 
-    def on_mqtt_disconnect(self, client, userdata, rc, properties=None):
+    def on_mqtt_disconnect(self, client, userdata, disconnect_flags, reason_code, properties=None):
         self.mqtt_connected = False
-        self.root.after(0, lambda: self.update_mqtt_ui("Disconnected", "Connect", "normal"))
+        self.root.after(0, lambda: self.update_mqtt_ui(f"Disconnected ({reason_code})", "Connect", "normal"))
 
     def update_mqtt_ui(self, status, btn_text, btn_state):
         self.mqtt_status_var.set(status)
         self.mqtt_connect_button.config(text=btn_text, state=btn_state)
 
     def on_closing(self):
-        """Ensures clean shutdown of MQTT thread and sockets."""
         if self.mqtt_connected and self.mqtt_client:
             try:
                 self.mqtt_client.loop_stop()
@@ -424,8 +374,8 @@ class TelemetryApp:
             self.udp_socket.close()
         except:
             pass
-        self.root.quit() # Stops the main loop
-        self.root.destroy() # Destroys the window
+        self.root.quit()
+        self.root.destroy()
 
 if __name__ == "__main__":
     root = tk.Tk()
