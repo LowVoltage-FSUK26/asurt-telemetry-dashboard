@@ -3,9 +3,9 @@ cmake_minimum_required(VERSION 3.16)
 project(GUI VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-find_package(Qt6 REQUIRED COMPONENTS Quick SerialPort Mqtt WebChannel WebEngineQuick Graphs)
-
+find_package(Qt6 REQUIRED COMPONENTS Quick SerialPort Mqtt Graphs Multimedia)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(GST REQUIRED gstreamer-1.0 gstreamer-webrtc-1.0 gstreamer-video-1.0 gstreamer-sdp-1.0 gstreamer-rtp-1.0)
 qt_standard_project_setup(REQUIRES 6.8)
 
 qt_add_executable(appGUI
@@ -24,6 +24,7 @@ qt_add_qml_module(appGUI
         QML_FILES src/UI/StatusBar/StatusBar.qml
         QML_FILES src/UI/InformationPage/Camera.qml
         QML_FILES src/UI/InformationPage/Graphs/LineGraph.qml
+        SOURCES src/Controllers/webrtc/include/webrtcclient.h src/Controllers/webrtc/src/webrtcclient.cpp
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
@@ -37,8 +38,11 @@ set_target_properties(appGUI PROPERTIES
     WIN32_EXECUTABLE TRUE
 )
 
+target_include_directories(appGUI PRIVATE ${GST_INCLUDE_DIRS})
+target_link_directories(appGUI PRIVATE ${GST_LIBRARY_DIRS})
+
 target_link_libraries(appGUI
-    PRIVATE Qt6::Quick Qt6::SerialPort Qt6::Mqtt Qt6::WebChannel Qt6::WebEngineQuick Qt6::Graphs
+    PRIVATE Qt6::Quick Qt6::SerialPort Qt6::Mqtt Qt6::Graphs Qt6::Multimedia ${GST_LIBRARIES}
 )
 
 include(GNUInstallDirs)

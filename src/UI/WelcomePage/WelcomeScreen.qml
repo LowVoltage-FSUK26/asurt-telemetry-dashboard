@@ -154,11 +154,11 @@ Rectangle {
                     }
                 }
 
-                /**** Field to Get the Borker Address ****/
+                /**** Field to Get the Broker Address ****/
 
                 Text {
                     visible: mqttradio.checked
-                    text: "Enter Borker Address"
+                    text: useRaspberryPi.checked ? "Enter tailscale's raspberry pi address" : "Enter Broker Address"
                     font {
                         bold: true
                         pixelSize: Math.max(10, 13 * root.scaleFactor)
@@ -231,7 +231,7 @@ Rectangle {
 
                 /**** Field to choose the mqttProtocol ****/
                 Text {
-                    visible : mqttradio.checked
+                    visible : mqttradio.checked && !useRaspberryPi.checked
                     text : "Select the Protocol"
                     font {
                         bold: true
@@ -245,7 +245,7 @@ Rectangle {
 
                 ComboBox {
                     id: mqttProtocolField
-                    visible: mqttradio.checked
+                    visible: mqttradio.checked && !useRaspberryPi.checked
                     model: ["MQTT over TCP", "MQTT over TLS"]
                     currentIndex: 0
                     width: Math.max(200, 300 * root.scaleFactor)
@@ -304,7 +304,7 @@ Rectangle {
                 /** Field to get mqtt Client ID*/
 
                 Text {
-                    visible: mqttradio.checked
+                    visible: mqttradio.checked && !useRaspberryPi.checked
                     text: "Enter Client ID:"
                     font {
                         bold: true
@@ -318,7 +318,7 @@ Rectangle {
 
                 TextField {
                     id: mqttClientIdField
-                    visible: mqttradio.checked
+                    visible: mqttradio.checked && !useRaspberryPi.checked
                     placeholderText: "Enter Client ID"
                     placeholderTextColor: "turquoise"
                     width: Math.max(200, 300 * root.scaleFactor)
@@ -343,7 +343,7 @@ Rectangle {
 
 
                 Text {
-                    visible: mqttradio.checked
+                    visible: mqttradio.checked && !useRaspberryPi.checked
                     text: "Enter Username:"
                     font {
                         bold: true
@@ -357,7 +357,7 @@ Rectangle {
 
                 TextField {
                     id: mqttUsernameField
-                    visible: mqttradio.checked
+                    visible: mqttradio.checked && !useRaspberryPi.checked
                     placeholderText: "Enter Username (e.g, John)"
                     placeholderTextColor: "turquoise"
 
@@ -382,7 +382,7 @@ Rectangle {
                 /**** Field to get the mqtt password ****/
 
                 Text {
-                    visible: mqttradio.checked
+                    visible: mqttradio.checked && !useRaspberryPi.checked
                     text: "Enter Password:"
                     font {
                         bold: true
@@ -395,7 +395,7 @@ Rectangle {
                 }
 
                 Rectangle {
-                    visible: mqttradio.checked
+                    visible: mqttradio.checked && !useRaspberryPi.checked
                     width: Math.max(200, 300 * root.scaleFactor)
                     height: Math.max(20, 25 * root.scaleFactor)
                     color: "#636363"
@@ -727,6 +727,12 @@ Rectangle {
                             }
                         }
                     }
+
+                    if (useRaspberryPi.checked)
+                        if (!inValid_Broker)
+                            webrtcClient.startPipeline(mqttbrokerAddressField.text);
+                        else
+                            console.error("Invalid tailscale ip address.");
                 }
             }
 
@@ -953,6 +959,19 @@ Rectangle {
                         anchors.left: parent.right
                         anchors.leftMargin: 5 * scaleFactor
                     }
+                }
+
+                CheckBox {
+                    id: useRaspberryPi
+                    checked: true
+                    text: "Use Raspberry Pi"
+                    font {
+                        bold: true
+                        family: "DS-Digital"
+                        pixelSize: Math.max(12, 18 * root.scaleFactor)
+                    }
+                    anchors.left: parent.left
+                    anchors.leftMargin: 5 * scaleFactor
                 }
             }
         }
